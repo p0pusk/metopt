@@ -1,5 +1,7 @@
-from interface import *
+#!/usr/bin/env python
+
+import interface
 
 if __name__ == "__main__":
-    values = Interface().get_data()
+    values = interface.Interface().get_data()
     print(values)
