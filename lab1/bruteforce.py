@@ -3,7 +3,6 @@ import itertools
 
 import problem
 
-
 def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c: list):
     N = list(range(len(c)))
 
@@ -36,9 +35,9 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
     return N, B, A, b, c, 0
 
 
-def brute_force(A: list, b: list, c: list):
-    # if obj_direction == Problem.ObjectiveDirection.MAX:
-    # c = [-n for n in c]
+def brute_force(A: list, b: list, c: list, sign: int):
+    c = [sign * n for n in c]
+
 
     if len(A) >= len(A[0]):
         return []

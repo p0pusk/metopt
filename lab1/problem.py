@@ -21,14 +21,14 @@ class Problem:
         CANON = 2
 
     def __init__(
-        self,
-        dim: int,
-        A: list[list],
-        b: list,
-        c: list,
-        restrictions_types: list[RestrictionType] = [],
-        x_restrictions: list[bool] = [],
-        obj_direction: ObjectiveDirection = ObjectiveDirection.MIN,
+            self,
+            dim: int,
+            A: list[list],
+            b: list,
+            c: list,
+            restrictions_types: list[RestrictionType] = [],
+            x_restrictions: list[bool] = [],
+            obj_direction: ObjectiveDirection = ObjectiveDirection.MIN,
     ) -> None:
         self.dim = int(dim)
         self.A = A
@@ -60,18 +60,24 @@ class Problem:
         N, B, A, b, c, v = bruteforce.to_canon(
             self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
         )
-        N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
-        print("simplex ans:")
-        print(simplex.simplex(N, B, A, b, c, v))
 
-        N, B, A, b, c, v = bruteforce.to_canon(
-            self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
-        )
+        print()
         print("Scipy ans:")
         print(linprog(A_eq=A, b_eq=b, c=c).x)
 
+        print()
         print("bruteforce ans:")
-        print(bruteforce.brute_force(A, b, c))
+        isMax = self.obj_direction == Problem.ObjectiveDirection.MAX
+        print(bruteforce.brute_force(A, b, c, self.obj_direction.value))
+
+        N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
+        print()
+        print("simplex ans:")
+        print(simplex.simplex(N, B, A, b, c, v))
+
+        # N, B, A, b, c, v = bruteforce.to_canon(
+        #     self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
+        # )
 
     def to_standart(self):
         if self.form == Problem.Form.STANDART:
@@ -130,7 +136,7 @@ class Problem:
                 if self.A[i][j] < 0:
                     print("-", end=" ")
 
-                print(f"{abs(self.A[i][j])}x_{j+1}", end=" ")
+                print(f"{abs(self.A[i][j])}x_{j + 1}", end=" ")
 
             if self.restrictions_types[i] == Problem.RestrictionType.GEQ:
                 print(">=", end=" ")
