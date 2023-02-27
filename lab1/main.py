@@ -4,6 +4,7 @@ import interface
 from problem import *
 from simplex import *
 from bruteforce import *
+from scipy.optimize import linprog
 
 
 if __name__ == "__main__":
@@ -52,15 +53,20 @@ if __name__ == "__main__":
     )
 
     prb3.Print()
-    prb3.ToStandart()
-    print("----------------")
-    prb3.Print()
-    print("----------------")
-    N, B, A, b, c, v = initialize_simplex(prb3.A, prb3.b, prb3.c)
-    print("simplex ans:")
-    print(simplex(N, B, A, b, c, v))
+
     N, B, A, b, c, v = to_canon(
         prb3.A, prb3.restrictions_types, prb3.b, prb3.x_restrictions, prb3.c
     )
+    print("Scipy ans:")
+    print(linprog(A_eq=A, b_eq=b, c=c).x)
+
     print("bruteforce ans:")
     print(brute_force(A, b, c))
+
+    # prb3.ToStandart()
+    # print("----------------")
+    # prb3.Print()
+    # print("----------------")
+    # N, B, A, b, c, v = initialize_simplex(prb3.A, prb3.b, prb3.c)
+    # print("simplex ans:")
+    # print(simplex(N, B, A, b, c, v))
