@@ -35,9 +35,8 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
     return N, B, A, b, c, 0
 
 
-def brute_force(A: list, b: list, c: list, sign: int):
+def brute_force(A: list, b: list, c: list, sign: int = 1):
     c = [sign * n for n in c]
-
 
     if len(A) >= len(A[0]):
         return []

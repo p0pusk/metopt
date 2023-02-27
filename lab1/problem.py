@@ -52,23 +52,23 @@ class Problem:
     def solve(self):
         print("GENERAL:")
         self.print()
-        self.to_standart()
+
         print("----------------")
         print("STANDART:")
+        self.to_standart()
         self.print()
+
         print("----------------")
+        print("RESULTS:")
         N, B, A, b, c, v = bruteforce.to_canon(
             self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
         )
-
-        print()
         print("Scipy ans:")
-        print(linprog(A_eq=A, b_eq=b, c=c).x)
+        print(linprog(A_eq=A, b_eq=b, c=[self.obj_direction.value * n for n in c]).x)
 
         print()
         print("bruteforce ans:")
-        isMax = self.obj_direction == Problem.ObjectiveDirection.MAX
-        print(bruteforce.brute_force(A, b, c, self.obj_direction.value))
+        print(bruteforce.brute_force(A, b, c, sign=self.obj_direction.value))
 
         N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
         print()
