@@ -1,14 +1,13 @@
 import numpy as np
 import itertools
 
-from lab1.problem import Problem
-from lab1.problem import *
+import problem
 
 
 def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c: list):
     N = list(range(len(c)))
 
-    for i  in range(len(x_restrictions)):
+    for i in range(len(x_restrictions)):
         if x_restrictions[i]:
             continue
         x_restrictions[i] = True
@@ -22,14 +21,14 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
             row.pop(i)
 
     for i in range(len(restrictions_types)):
-        if restrictions_types[i] == Problem.RestrictionType.EQ:
+        if restrictions_types[i] == problem.Problem.RestrictionType.EQ:
             continue
         c += [0]
 
-        val = 1 if restrictions_types[i] == Problem.RestrictionType.LEQ else -1
+        val = 1 if restrictions_types[i] == problem.Problem.RestrictionType.LEQ else -1
         for j in range(len(A)):
             A[j] += [val * (i == j)]
-        restrictions_types[i] = Problem.RestrictionType.EQ
+        restrictions_types[i] = problem.Problem.RestrictionType.EQ
 
     x_restrictions += [True] * (len(c) - len(x_restrictions) - 1)
 
@@ -56,7 +55,7 @@ def brute_force(A: list, b: list, c: list):
     bases = []
     for i in range(len(combs)):
         sol = np.linalg.solve(combs[i], b)
-        if len(sol[sol < 0]) != 0 or len(sol[sol > 1e+16]) != 0:
+        if len(sol[sol < 0]) != 0 or len(sol[sol > 1e16]) != 0:
             continue
 
         basis = [0] * len(A[0])

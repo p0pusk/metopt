@@ -1,4 +1,8 @@
 from enum import Enum
+from scipy.optimize import linprog
+
+import simplex
+import bruteforce
 
 
 class Problem:
@@ -36,13 +40,40 @@ class Problem:
         self.n = self.dim
         self.m = len(b)
         self.form = Problem.Form.GENERAL
+        self.N = []
+        self.B = []
+        self.v = []
 
         assert self.n == len(A[0])
         assert self.m == len(A)
         assert len(self.c) == self.n
         assert len(restrictions_types) == self.m
 
-    def ToStandart(self):
+    def solve(self):
+        print("GENERAL:")
+        self.print()
+        self.to_standart()
+        print("----------------")
+        print("STANDART:")
+        self.print()
+        print("----------------")
+        N, B, A, b, c, v = bruteforce.to_canon(
+            self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
+        )
+        N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
+        print("simplex ans:")
+        print(simplex.simplex(N, B, A, b, c, v))
+
+        N, B, A, b, c, v = bruteforce.to_canon(
+            self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
+        )
+        print("Scipy ans:")
+        print(linprog(A_eq=A, b_eq=b, c=c).x)
+
+        print("bruteforce ans:")
+        print(bruteforce.brute_force(A, b, c))
+
+    def to_standart(self):
         if self.form == Problem.Form.STANDART:
             return
         if self.obj_direction == Problem.ObjectiveDirection.MIN:
@@ -50,7 +81,6 @@ class Problem:
             self.obj_direction = Problem.ObjectiveDirection.MAX
         for i in range(len(self.x_restrictions)):
             if not self.x_restrictions[i]:
-                self.dim = self.dim + 1
                 self.c.insert(i + 1, -self.c[i])
                 for j in range(len(self.A)):
                     self.A[j].insert(i + 1, -self.A[j][i])
@@ -71,13 +101,16 @@ class Problem:
                 self.restrictions_types[idx] = Problem.RestrictionType.LEQ
         self.form = Problem.Form.STANDART
 
-    def ToCanon(self):
+    def to_canon(self):
+        bruteforce.to_canon(
+            self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
+        )
+        self.form = Problem.Form.CANON
+
+    def get_dual(self):
         pass
 
-    def GetDual(self):
-        pass
-
-    def Print(self):
+    def print(self):
         for idx, c in enumerate(self.c):
             if c >= 0 and idx > 0:
                 print("+", end=" ")
