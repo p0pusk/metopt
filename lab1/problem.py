@@ -74,6 +74,9 @@ class Problem:
     def ToCanon(self):
         pass
 
+    def GetDual(self):
+        pass
+
     def Print(self):
         for idx, c in enumerate(self.c):
             if c >= 0 and idx > 0:

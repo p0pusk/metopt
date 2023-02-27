@@ -10,6 +10,27 @@ if __name__ == "__main__":
     # values = interface.Interface().get_data()
 
     prb = Problem(
+        dim=2,
+        A=[[1, 1], [1, -2]],  # m*n
+        b=[7, 4],  # m
+        c=[-2, 3],  # n
+        restrictions_types=[
+            Problem.RestrictionType.EQ,
+            Problem.RestrictionType.LEQ,
+        ],  # m
+        x_restrictions=[True, False],  # n
+    )
+
+    prb2 = Problem(
+        dim=2,
+        A=[[1, 1]],  # m*n
+        b=[7],  # m
+        c=[2, 3],  # n
+        restrictions_types=[Problem.RestrictionType.LEQ],  # m
+        x_restrictions=[True, True],  # n
+    )
+
+    prb3 = Problem(
         dim=5,
         A=[
             [1, 2, 3, 4, 1],
@@ -25,31 +46,21 @@ if __name__ == "__main__":
             Problem.RestrictionType.EQ,
             Problem.RestrictionType.EQ,
             Problem.RestrictionType.EQ,
-            Problem.RestrictionType.LEQ
+            Problem.RestrictionType.LEQ,
         ],
         x_restrictions=[True, True, True, True, False],
     )
 
-    # prb = Problem(
-    #     dim=2,
-    #     A=[[1, 1], [1, -2]],
-    #     b=[7, 4],
-    #     c=[-2, 3],
-    #     restrictions_types=[Problem.RestrictionType.EQ, Problem.RestrictionType.LEQ],
-    #     x_restrictions=[True, False],
-    # )
-
-    # prb.Print()
-    # prb.ToStandart()
-    # print("----------------")
-    # prb.Print()
-    # print("----------------")
-    # N, B, A, b, c, v = initialize_simplex(prb.A, prb.b, prb.c)
-    # print(simplex(N, B, A, b, c, v))
-
-    prb.Print()
-    N, B, A, b, c, v = to_canon(prb.A, prb.restrictions_types, prb.b, prb.x_restrictions, prb.c)
-    print()
-    res = brute_force(A, b, c)
-    print("res:")
-    print(res)
+    prb3.Print()
+    prb3.ToStandart()
+    print("----------------")
+    prb3.Print()
+    print("----------------")
+    N, B, A, b, c, v = initialize_simplex(prb3.A, prb3.b, prb3.c)
+    print("simplex ans:")
+    print(simplex(N, B, A, b, c, v))
+    N, B, A, b, c, v = to_canon(
+        prb3.A, prb3.restrictions_types, prb3.b, prb3.x_restrictions, prb3.c
+    )
+    print("bruteforce ans:")
+    print(brute_force(A, b, c))
