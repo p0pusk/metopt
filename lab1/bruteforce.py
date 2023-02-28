@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
-
 import problem
+
 
 def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c: list):
     N = list(range(len(c)))
@@ -13,7 +13,7 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
             c[i] *= -1
             continue
 
-        if x_restrictions[i] is None:
+        if x_restrictions[i] is problem.Problem.RestrictionType.NONE:
             N += [len(c)]
 
             for row in A:
@@ -34,7 +34,9 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
             A[j] += [val * (i == j)]
         restrictions_types[i] = problem.Problem.RestrictionType.EQ
 
-    x_restrictions += [problem.Problem.RestrictionType.GEQ] * (len(c) - len(x_restrictions) - 1)
+    x_restrictions += [problem.Problem.RestrictionType.GEQ] * (
+        len(c) - len(x_restrictions) - 1
+    )
 
     B = [i + len(N) for i in range(len(c) - len(N))]
     return N, B, A, b, c, 0
