@@ -1,3 +1,4 @@
+from copy import copy
 from enum import Enum
 from scipy.optimize import linprog
 
@@ -7,6 +8,7 @@ import bruteforce
 
 class Problem:
     class RestrictionType(Enum):
+        None
         EQ = 0
         LEQ = -1
         GEQ = 1
@@ -27,7 +29,7 @@ class Problem:
             b: list,
             c: list,
             restrictions_types: list[RestrictionType] = [],
-            x_restrictions: list[bool] = [],
+            x_restrictions: list[RestrictionType] = [],
             obj_direction: ObjectiveDirection = ObjectiveDirection.MIN,
     ) -> None:
         self.dim = int(dim)
@@ -52,13 +54,23 @@ class Problem:
     def solve(self):
         print("GENERAL:")
         self.print()
-
         print("----------------")
-        print("STANDART:")
-        self.to_standart()
-        self.print()
 
+        print("DUAL:")
+        dual = self.get_dual()
+        dual.print()
         print("----------------")
+
+        # print("STANDART:")
+        # self.to_standart()
+        # self.print()
+        # print("----------------")
+
+        # print("DUAL STANDART:")
+        # dual.to_standart()
+        # dual.print()
+        # print("----------------")
+
         print("RESULTS:")
         N, B, A, b, c, v = bruteforce.to_canon(
             self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
@@ -70,14 +82,27 @@ class Problem:
         print("bruteforce ans:")
         print(bruteforce.brute_force(A, b, c, sign=self.obj_direction.value))
 
-        N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
-        print()
-        print("simplex ans:")
-        print(simplex.simplex(N, B, A, b, c, v))
+        # N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
+        # print()
+        # print("simplex ans:")
+        # print(simplex.simplex(N, B, A, b, c, v))
+        print("----------------")
 
-        # N, B, A, b, c, v = bruteforce.to_canon(
-        #     self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
-        # )
+        print("RESULTS FOR DUAL:")
+        N, B, A, b, c, v = bruteforce.to_canon(
+            dual.A, dual.restrictions_types, dual.b, dual.x_restrictions, dual.c
+        )
+        print("Scipy ans:")
+        print(linprog(A_eq=A, b_eq=b, c=[dual.obj_direction.value * n for n in c]).x)
+
+        print()
+        print("bruteforce ans:")
+        print(bruteforce.brute_force(A, b, c, sign=dual.obj_direction.value))
+        #
+        # N, B, A, b, c, v = simplex.initialize_simplex(A, b, c)
+        # print()
+        # print("simplex ans:")
+        # print(simplex.simplex(N, B, A, b, c, v))
 
     def to_standart(self):
         if self.form == Problem.Form.STANDART:
@@ -114,7 +139,37 @@ class Problem:
         self.form = Problem.Form.CANON
 
     def get_dual(self):
-        pass
+        # x_r = [None if r_t == Problem.RestrictionType.EQ else r_t for r_t in copy(self.restrictions_types)]
+        x_r = []
+        for r in self.restrictions_types:
+            if r == Problem.RestrictionType.GEQ:
+                x_r += [r]
+            elif r == Problem.RestrictionType.EQ:
+                x_r += [None]
+            else:
+                x_r += [Problem.RestrictionType.LEQ]
+
+        return Problem(
+            dim=self.dim,
+            A=[list(i) for i in zip(*self.A)],
+            b=copy(self.c),
+            c=copy(self.b),
+            restrictions_types=[Problem.RestrictionType(-x_r.value if x_r else 0) for x_r in copy(self.x_restrictions)],
+            x_restrictions=x_r,
+            obj_direction=Problem.ObjectiveDirection(-self.obj_direction.value)
+        )
+
+        return None
+        # return Problem(
+        #     dim=self.dim,
+        #     A=[list(i) for i in zip(*self.A)],
+        #     b=self.c[:-1],
+        #     c=self.b,
+        #     restrictions_types=[Problem.RestrictionType(-x_r.value if x_r else 0) for x_r in self.x_restrictions],
+        #     x_restrictions=[None if r_t == Problem.RestrictionType.EQ else r_t for r_t in self.restrictions_types],
+        #     obj_direction=Problem.ObjectiveDirection(-self.obj_direction.value)
+        # )
+
 
     def print(self):
         for idx, c in enumerate(self.c):
@@ -148,8 +203,14 @@ class Problem:
             print(self.b[i])
 
         for idx, r in enumerate(self.x_restrictions):
+            if not r:
+                continue
             if idx > 0:
                 print(",", end=" ")
-            if r:
-                print(f"x_{idx + 1}", end="")
-        print(" >= 0")
+            if r == Problem.RestrictionType.GEQ:
+                print(f"x_{idx + 1} >= 0", end="")
+            elif r == Problem.RestrictionType.LEQ:
+                print(f"x_{idx + 1} <= 0", end="")
+            elif r == Problem.RestrictionType.EQ:
+                print(f"x_{idx + 1} = 0", end="")
+        print("")

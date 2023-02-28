@@ -7,17 +7,22 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
     N = list(range(len(c)))
 
     for i in range(len(x_restrictions)):
-        if x_restrictions[i]:
+        if x_restrictions[i] == problem.Problem.RestrictionType.LEQ:
+            for row in A:
+                row[i] *= -1
+            c[i] *= -1
             continue
-        x_restrictions[i] = True
 
-        N += [len(c) - 1]
-        c += [c[i], -c[i]]
-        c.pop(i)
+        if x_restrictions[i] is None:
+            N += [len(c)]
 
-        for row in A:
-            row += [row[i], -row[i]]
-            row.pop(i)
+            for row in A:
+                row += [row[i], -row[i]]
+                row.pop(i)
+            c += [c[i], -c[i]]
+            c.pop(i)
+
+        x_restrictions[i] = problem.Problem.RestrictionType.GEQ
 
     for i in range(len(restrictions_types)):
         if restrictions_types[i] == problem.Problem.RestrictionType.EQ:
@@ -29,7 +34,7 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
             A[j] += [val * (i == j)]
         restrictions_types[i] = problem.Problem.RestrictionType.EQ
 
-    x_restrictions += [True] * (len(c) - len(x_restrictions) - 1)
+    x_restrictions += [problem.Problem.RestrictionType.GEQ] * (len(c) - len(x_restrictions) - 1)
 
     B = [i + len(N) for i in range(len(c) - len(N))]
     return N, B, A, b, c, 0
