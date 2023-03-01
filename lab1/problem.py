@@ -74,11 +74,9 @@ class Problem:
 
         print()
         print("simplex ans:")
-        N, B, A, b, c, v = simplex._initialize_simplex(
-            standart.A, standart.b, standart.c
-        )
+        spx = simplex.Simplex(standart.A, standart.b, standart.c)
 
-        print(simplex.simplex(N, B, A, b, c, v))
+        print(spx.simplex()[: self.dim])
 
         # print()
         # print("bruteforce ans:")
@@ -106,13 +104,12 @@ class Problem:
         print(f"v = {sum(dual.c[i] * x[i] for i in range(len(x)))}")
 
         print()
-        dual_standart = dual.get_standart()
         print("simplex ans:")
-        N, B, A, b, c, v = simplex._initialize_simplex(
-            dual_standart.A, dual_standart.b, dual_standart.c
-        )
+        dual_standart = dual.get_standart()
+        spx = simplex.Simplex(dual_standart.A, dual_standart.b, dual_standart.c)
 
-        print(simplex.simplex(N, B, A, b, c, v))
+        print(spx.simplex()[: self.dim])
+
         # print()
         # print("bruteforce ans:")
         # print(
