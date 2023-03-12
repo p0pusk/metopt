@@ -74,7 +74,11 @@ class Problem:
 
         print()
         print("simplex ans:")
-        spx = simplex.Simplex(standart.A, standart.b, standart.c)
+        try:
+            spx = simplex.Simplex(standart.A, standart.b, standart.c)
+        except Exception as e:
+            print(e)
+            return
 
         print(spx.simplex()[: self.dim])
 
