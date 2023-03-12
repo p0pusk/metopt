@@ -1,3 +1,4 @@
+from math import exp
 import PySimpleGUI as sg
 from problem import *
 
@@ -8,6 +9,9 @@ class Interface:
         self.dim = 2
         self.max_dim = 6
         self.restrictions_num = 2
+        font = ("Arial", 28)
+        sg.set_options(font=font)
+        sg.theme("Reddit")
 
     def display_result(self, result):
         if self.method is None:
@@ -20,29 +24,30 @@ class Interface:
         sg.popup_error("There is some problem with input data or method")
 
     def __create_window(self):
-        sg.theme("DarkAmber")
         layout = [
             [
-                sg.Text("Dimension:"),
+                sg.Text("Dimension:", expand_x=True, expand_y=True),
                 sg.Combo(
                     values=[*range(1, self.max_dim + 1)],
                     default_value=self.dim,
                     readonly=True,
                     enable_events=True,
                     key="-DIMENSION-",
+                    expand_x=True,
                 ),
             ],
             [
-                sg.Text("Number of restrictions:"),
+                sg.Text("Number of restrictions:", expand_x=True, expand_y=True),
                 sg.Combo(
                     values=[*range(1, self.max_dim + 1)],
                     default_value=self.restrictions_num,
                     readonly=True,
                     enable_events=True,
                     key="-RESTRICTIONS-",
+                    expand_x=True,
                 ),
             ],
-            [sg.Button("Submit"), sg.Button("Cancel")],
+            [sg.Button("Submit", expand_x=True), sg.Button("Cancel", expand_x=True)],
         ]
 
         return sg.Window(
@@ -51,23 +56,26 @@ class Interface:
             use_default_focus=False,
             resizable=True,
             auto_size_text=True,
-            font=60,
         )
 
     def create_function_row(self):
         row = []
         for i in range(self.dim):
             if i != 0:
-                row.append(sg.Text("+"))
+                row.append(sg.Text("+", expand_x=True, expand_y=True))
             else:
-                row.append(sg.Text("f(x) = "))
-            row.append(sg.Input(size=(2, 0), key=("c", i)))
-            row.append(sg.Text(f"x_{i} "))
+                row.append(sg.Text("f(x) = ", expand_x=True, expand_y=True))
+            row.append(sg.Input(size=(2, 0), key=("c", i), expand_x=True))
+            row.append(sg.Text(f"x_{i} ", expand_x=True))
 
-        row.append(sg.Text("-->"))
+        row.append(sg.Text("-->", expand_x=True))
         row.append(
             sg.Combo(
-                ["MIN", "MAX"], default_value="MAX", readonly=True, key="opt_direction"
+                ["MIN", "MAX"],
+                default_value="MAX",
+                readonly=True,
+                key="opt_direction",
+                expand_x=True,
             )
         )
         return row
@@ -76,20 +84,20 @@ class Interface:
         row = []
         for i in range(self.dim):
             if i != 0:
-                row.append(sg.Text("+"))
-            row.append(sg.Input(size=(2, 0), key=("A", row_number, i)))
-            row.append(sg.Text(f"x_{i} "))
+                row.append(sg.Text("+", expand_x=True, expand_y=True))
+            row.append(sg.Input(size=(2, 0), key=("A", row_number, i), expand_x=True))
+            row.append(sg.Text(f"x_{i} ", expand_x=True, expand_y=True))
 
         row.append(
             sg.Combo(
-                values=["<=", ">=", "="],
-                default_value="<=",
+                values=["≤", "≥", "="],
+                default_value="≤",
                 readonly=True,
-                size=(2, 0),
                 key=("restrictions", row_number),
+                expand_x=True,
             )
         )
-        row.append(sg.Input(size=(2, 0), key=("b", row_number)))
+        row.append(sg.Input(size=(2, 0), key=("b", row_number), expand_x=True))
         return row
 
     def create_restrictions_input(self):
@@ -102,7 +110,12 @@ class Interface:
         x_restr = []
         for i in range(self.dim):
             x_restr.append(
-                sg.Checkbox(f"x_{i} >= 0", default=True, key=("x_restrictions", i))
+                sg.Checkbox(
+                    f"x_{i} ≥ 0",
+                    default=True,
+                    key=("x_restrictions", i),
+                    expand_x=True,
+                )
             )
         return x_restr
 
@@ -110,12 +123,11 @@ class Interface:
         layout = [
             [
                 sg.Text("Choose method:"),
-                sg.Listbox(
+                sg.Combo(
                     ["bruteforce", "simplex"],
-                    default_values="bruteforce",
-                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE,
-                    no_scrollbar=True,
+                    default_value="bruteforce",
                     size=(30, 0),
+                    readonly=True,
                     enable_events=True,
                     key="-MODE-",
                 ),
@@ -125,17 +137,17 @@ class Interface:
             [sg.Text("Restrictions:")],
             [self.create_restrictions_input()],
             [self.create_x_restrictions_input()],
-            [sg.Button("Solve"), sg.Button("Cancel")],
+            [sg.Button("Solve", expand_x=True), sg.Button("Cancel", expand_x=True)],
         ]
 
-        return sg.Window("Lab1", layout, resizable=True, font=30)
+        return sg.Window("Lab1", layout, resizable=True)
 
     def read_input(self, values):
-        self.method = (
-            Problem.Method.BRUTEFORCE
-            if values["-MODE-"] == "bruteforce"
-            else Problem.Method.SIMPLEX
-        )
+        if values["-MODE-"][0] == "bruteforce":
+            self.method = Problem.Method.BRUTEFORCE
+        elif values["-MODE-"][0] == "simplex":
+            self.method = Problem.Method.SIMPLEX
+
         A = [[0.0] * (self.dim) for _ in range(self.restrictions_num)]
         b = [0.0] * self.restrictions_num
         c = [0.0] * self.dim
@@ -163,9 +175,9 @@ class Interface:
                 return None
             b[i] = float(values["b", i])
 
-            if values["restrictions", i] == "<=":
+            if values["restrictions", i] == "≤":
                 restrictions_types[i] = Problem.RestrictionType.LEQ
-            elif values["restrictions", i] == ">=":
+            elif values["restrictions", i] == "≥":
                 restrictions_types[i] = Problem.RestrictionType.GEQ
             else:
                 restrictions_types[i] = Problem.RestrictionType.EQ
@@ -204,7 +216,10 @@ class Interface:
                 event, values = window.read()
                 if event in (None, "Exit", "Cancel"):
                     break
-                if event == "Solve":
+
+                if event == "-MODE-":
+                    print(values["-MODE-"])
+                elif event == "Solve":
                     problem = self.read_input(values)
                     if problem == None:
                         self.display_error()
@@ -212,8 +227,13 @@ class Interface:
                         problem.print()
                         try:
                             x = problem.solve(self.method)
-                            print("====")
-                            print(f"our's x = {x}")
-                            print(f"scipy x = {problem.solve(Problem.Method.SCIPY)}")
+                            sg.popup_no_buttons(
+                                (
+                                    f"Solution by bruteforce:\nx = {x}"
+                                    if self.method == Problem.Method.BRUTEFORCE
+                                    else f"Solution by simplex:\nx = {x}"
+                                ),
+                                title="Solution",
+                            )
                         except Exception as e:
                             self.display_error()

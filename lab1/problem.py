@@ -58,10 +58,10 @@ class Problem:
                 spx = simplex.Simplex(standart.A, standart.b, standart.c)
             except Exception as e:
                 raise e
-            return spx.simplex()
+            return spx.simplex()[: self.dim]
         elif mode == Problem.Method.BRUTEFORCE:
             canon = self.get_canon()
-            return bruteforce.brute_force(canon.A, canon.b, canon.c)
+            return bruteforce.brute_force(canon.A, canon.b, canon.c)[: self.dim]
         elif mode == Problem.Method.SCIPY:
             standart = self.get_standart()
             x = linprog(
