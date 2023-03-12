@@ -197,7 +197,7 @@ class Simplex:
             if i in self.B:
                 x[i] = self.b[i]
             else:
-                x[i] = 0
+                x[i] = 0.0
         return x
 
 

@@ -20,8 +20,8 @@ class Interface:
         sg.popup("Result of the method ' " + str(self.method) + " ' " + str(result))
 
     @staticmethod
-    def display_error():
-        sg.popup_error("There is some problem with input data or method")
+    def display_error(text: str):
+        sg.popup_error(text)
 
     def __create_window(self):
         layout = [
@@ -39,7 +39,7 @@ class Interface:
             [
                 sg.Text("Number of restrictions:", expand_x=True, expand_y=True),
                 sg.Combo(
-                    values=[*range(1, self.max_dim + 1)],
+                    values=[*range(1, self.max_dim)],
                     default_value=self.restrictions_num,
                     readonly=True,
                     enable_events=True,
@@ -137,15 +137,15 @@ class Interface:
             [sg.Text("Restrictions:")],
             [self.create_restrictions_input()],
             [self.create_x_restrictions_input()],
-            [sg.Button("Solve", expand_x=True), sg.Button("Cancel", expand_x=True)],
+            [sg.Button("Solve", expand_x=True), sg.Button("Back", expand_x=True)],
         ]
 
         return sg.Window("Lab1", layout, resizable=True)
 
     def read_input(self, values):
-        if values["-MODE-"][0] == "bruteforce":
+        if values["-MODE-"] == "bruteforce":
             self.method = Problem.Method.BRUTEFORCE
-        elif values["-MODE-"][0] == "simplex":
+        elif values["-MODE-"] == "simplex":
             self.method = Problem.Method.SIMPLEX
 
         A = [[0.0] * (self.dim) for _ in range(self.restrictions_num)]
@@ -192,48 +192,52 @@ class Interface:
             x_restrictions=x_restrictions,
         )
 
-    def run(self):
+    def open_starting_window(self):
         window = self.__create_window()
-        create_problem = False
         while True:
             event, values = window.read()
             if event in (None, "Exit", "Cancel"):
                 window.close()
                 break
             if event in ("Submit"):
-                create_problem = True
                 window.close()
+                self.open_input_win()
                 break
             elif event == "-DIMENSION-":
                 self.dim = values["-DIMENSION-"]
             elif event == "-RESTRICTIONS-":
                 self.restrictions_num = values["-RESTRICTIONS-"]
 
-        if create_problem:
-            window = self.create_problem_window()
+    def open_input_win(self):
+        window = self.create_problem_window()
 
-            while True:
-                event, values = window.read()
-                if event in (None, "Exit", "Cancel"):
-                    break
+        while True:
+            event, values = window.read()
+            if event in (None, "Exit"):
+                break
+            if event == "Back":
+                window.close()
+                self.open_starting_window()
+                break
+            elif event == "Solve":
+                problem = self.read_input(values)
+                if problem == None:
+                    self.display_error("Not all values inserted")
+                else:
+                    try:
+                        x = problem.solve(self.method)
+                        sg.popup_no_buttons(
+                            (
+                                f"Solution by bruteforce:\nx = {x}"
+                                if self.method == Problem.Method.BRUTEFORCE
+                                else f"Solution by simplex:\nx = {x}"
+                            ),
+                            title="Solution",
+                        )
+                    except Exception as e:
+                        self.display_error(
+                            "Problem is not restricted, the answer is infinty"
+                        )
 
-                if event == "-MODE-":
-                    print(values["-MODE-"])
-                elif event == "Solve":
-                    problem = self.read_input(values)
-                    if problem == None:
-                        self.display_error()
-                    else:
-                        problem.print()
-                        try:
-                            x = problem.solve(self.method)
-                            sg.popup_no_buttons(
-                                (
-                                    f"Solution by bruteforce:\nx = {x}"
-                                    if self.method == Problem.Method.BRUTEFORCE
-                                    else f"Solution by simplex:\nx = {x}"
-                                ),
-                                title="Solution",
-                            )
-                        except Exception as e:
-                            self.display_error()
+    def run(self):
+        self.open_starting_window()
