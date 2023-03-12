@@ -1,7 +1,5 @@
 from copy import copy, deepcopy
 from enum import Enum
-
-import numpy as np
 from numpy import obj2sctype
 from scipy.optimize import linprog
 
@@ -80,6 +78,7 @@ class Problem:
 
 
         print("=======================================================================")
+
         print("RESULTS:")
         print("Scipy answer for standart:")
         x = linprog(
@@ -91,8 +90,13 @@ class Problem:
         print(f"v = {sum(standart.c[i] * x[i] for i in range(len(x)))}")
 
         print()
-        print("simplex answer for standart:")
-        spx = simplex.Simplex(standart.A, standart.b, standart.c)
+        print("simplex ans:")
+        try:
+            spx = simplex.Simplex(standart.A, standart.b, standart.c)
+        except Exception as e:
+            print(e)
+            return
+
         print(spx.simplex()[: self.dim])
 
         print()

@@ -8,5 +8,5 @@ from examples import prb3 as prb
 
 
 if __name__ == "__main__":
-    # values = interface.Interface().get_data()
-    prb.solve()
+    interface.Interface().run()
+    # prb.solve()
