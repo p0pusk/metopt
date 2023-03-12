@@ -1,5 +1,7 @@
 from copy import copy, deepcopy
 from enum import Enum
+
+import numpy as np
 from numpy import obj2sctype
 from scipy.optimize import linprog
 
@@ -50,20 +52,36 @@ class Problem:
         print("=======================================================================")
         print("GENERAL:")
         self.print()
-        print("=======================================================================")
 
+        print("=======================================================================")
+        print("CANON:")
+        canon = self.get_canon()
+        canon.print()
+
+        print("=======================================================================")
         print("STANDART:")
         standart = self.get_standart()
         standart.print()
-        print("=======================================================================")
 
+        print("=======================================================================")
         print("DUAL:")
         dual = self.get_dual()
         dual.print()
-        print("=======================================================================")
 
+        print("=======================================================================")
+        print("DUAL CANON:")
+        dual_canon = dual.get_canon()
+        dual_canon.print()
+
+        print("=======================================================================")
+        print("DUAL STANDART:")
+        dual_standart = dual.get_standart()
+        dual_standart.print()
+
+
+        print("=======================================================================")
         print("RESULTS:")
-        print("Scipy ans:")
+        print("Scipy answer for standart:")
         x = linprog(
             A_ub=standart.A,
             b_ub=standart.b,
@@ -73,20 +91,15 @@ class Problem:
         print(f"v = {sum(standart.c[i] * x[i] for i in range(len(x)))}")
 
         print()
-        print("simplex ans:")
+        print("simplex answer for standart:")
         spx = simplex.Simplex(standart.A, standart.b, standart.c)
-
         print(spx.simplex()[: self.dim])
 
-        # print()
-        # print("bruteforce ans:")
-        # print(
-        #     bruteforce.brute_force(
-        #         standart.A, standart.b, standart.c, sign=standart.obj_direction.value
-        #     )
-        # )
-        print("=======================================================================")
+        print()
+        print("bruteforce answer for canon:")
+        print(bruteforce.brute_force(canon.A, canon.b, canon.c)[:self.dim])
 
+        print("=======================================================================")
         print("RESULTS FOR DUAL:")
 
         neg_dual_A = deepcopy(dual.A)
@@ -94,7 +107,7 @@ class Problem:
             for i in range(len(neg_dual_A[0])):
                 neg_dual_A[col][i] *= -1
 
-        print("Scipy ans:")
+        print("Scipy answer:")
         x = linprog(
             A_ub=neg_dual_A,
             b_ub=[-v for v in dual.b],
@@ -104,19 +117,13 @@ class Problem:
         print(f"v = {sum(dual.c[i] * x[i] for i in range(len(x)))}")
 
         print()
-        print("simplex ans:")
-        dual_standart = dual.get_standart()
+        print("simplex answer for dual standart:")
         spx = simplex.Simplex(dual_standart.A, dual_standart.b, dual_standart.c)
-
         print(spx.simplex()[: self.dim])
 
-        # print()
-        # print("bruteforce ans:")
-        # print(
-        #     bruteforce.brute_force(
-        #         dual.A, dual.b, dual.c, sign=dual.obj_direction.value
-        #     )
-        # )
+        print()
+        print("bruteforce answer for dual canon:")
+        print(bruteforce.brute_force(dual_canon.A, dual_canon.b, dual_canon.c)[:self.dim])
 
     def get_standart(self):
         standart = Problem(
@@ -157,11 +164,25 @@ class Problem:
 
         return standart
 
-    def to_canon(self):
-        bruteforce.to_canon(
-            self.A, self.restrictions_types, self.b, self.x_restrictions, self.c
+    def get_canon(self):
+        A_copy = deepcopy(self.A)
+        restrictions_types_copy = self.restrictions_types.copy()
+        b_copy = self.b.copy()
+        x_restrictions_copy = self.x_restrictions.copy()
+        c_copy = self.c.copy()
+
+        N, B, A, b, c, v = bruteforce.to_canon(A_copy, restrictions_types_copy, b_copy, x_restrictions_copy, c_copy)
+        canon = Problem(
+            dim=len(b_copy),
+            A=A,
+            b=b,
+            c=c,
+            restrictions_types=restrictions_types_copy,
+            x_restrictions=x_restrictions_copy,
+            obj_direction=self.obj_direction,
         )
-        self.form = Problem.Form.CANON
+        canon.form = Problem.Form.CANON
+        return canon
 
     def get_dual(self):
         # x_r = [None if r_t == Problem.RestrictionType.EQ else r_t for r_t in copy(self.restrictions_types)]
@@ -202,7 +223,7 @@ class Problem:
             if c < 0:
                 print("-", end=" ")
 
-            print(f"{abs(c)}x_{idx + 1}", end=" ")
+            print(f"{abs(c)} * x_{idx + 1}", end=" ")
         if self.obj_direction == Problem.ObjectiveDirection.MIN:
             print("--> MIN")
         else:
@@ -215,7 +236,7 @@ class Problem:
                 if self.A[i][j] < 0:
                     print("-", end=" ")
 
-                print(f"{abs(self.A[i][j])}x_{j + 1}", end=" ")
+                print(f"{abs(self.A[i][j])} * x_{j + 1}", end=" ")
 
             if self.restrictions_types[i] == Problem.RestrictionType.GEQ:
                 print(">=", end=" ")
