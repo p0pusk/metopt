@@ -1,26 +1,9 @@
 import copy
 import math
-import bruteforce
-import problem as prb
 
 
 class Simplex:
     # In standart form
-    def __init_table(
-        self, N: list[int], B: list[int], A: list[list], b: list, c: list, v: float
-    ) -> None:
-        N, B, A, b, c = (
-            copy.deepcopy(N),
-            copy.deepcopy(B),
-            copy.deepcopy(A),
-            copy.deepcopy(b),
-            copy.deepcopy(c),
-        )
-        n = len(N)
-        m = len(B)
-        self.N = N
-        self.B = B
-
     def pivot(
         self,
         N: list,
@@ -69,8 +52,6 @@ class Simplex:
         self.B.pop(B.index(l))
         self.B.append(e)
 
-        return self.N, self.B, self.A, self.b, self.c, self.v
-
     def __init__(self, A: list[list], b: list, c: list):
         m = len(A)
         n = len(A[0])
@@ -90,14 +71,14 @@ class Simplex:
             self.N = [*range(n)]
             self.B = [*range(n, n + m)]
             self.v = 0
-            self.A = [[0.0] * (n + m)] * (n + m)
+            self.A = [[0.0] * (n + m) for _ in range(n + m)]
             self.b = [0.0] * (n + m)
             self.c = [0.0] * (n + m)
 
             for i in range(m):
-                self.b[i] = b[i]
+                self.b[n + i] = b[i]
                 for j in range(n):
-                    self.A[i][j] = A[i][j]
+                    self.A[n + i][j] = A[i][j]
 
             for j in range(n):
                 self.c[j] = c[j]

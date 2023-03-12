@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 import problem
-import sympy
+
 
 def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c: list):
     # Создаем список индексов базисных переменных N
@@ -54,6 +54,7 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
 
     # Возвращаем все преобразованные данные
     return N, B, A, b, c, 0
+
 
 def brute_force(A: list, b: list, c: list):
     # Проверка размерности A и b

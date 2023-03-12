@@ -1,13 +1,13 @@
 import PySimpleGUI as sg
-import problem
+from problem import *
 
 
 class Interface:
     def __init__(self):
-        self.method = None
-        self.dim = 3
+        self.method = Problem.Method.BRUTEFORCE
+        self.dim = 2
         self.max_dim = 6
-        self.restrictions_num = 3
+        self.restrictions_num = 2
 
     def display_result(self, result):
         if self.method is None:
@@ -23,16 +23,6 @@ class Interface:
         sg.theme("DarkAmber")
         layout = [
             [
-                sg.Text("Choose method:"),
-                sg.Listbox(
-                    ["bruteforce", "simplex"],
-                    default_values="bruteforce",
-                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE,
-                    no_scrollbar=True,
-                    size=(30, 0),
-                ),
-            ],
-            [
                 sg.Text("Dimension:"),
                 sg.Combo(
                     values=[*range(1, self.max_dim + 1)],
@@ -46,7 +36,7 @@ class Interface:
                 sg.Text("Number of restrictions:"),
                 sg.Combo(
                     values=[*range(1, self.max_dim + 1)],
-                    default_value=self.dim,
+                    default_value=self.restrictions_num,
                     readonly=True,
                     enable_events=True,
                     key="-RESTRICTIONS-",
@@ -118,6 +108,18 @@ class Interface:
 
     def create_problem_window(self):
         layout = [
+            [
+                sg.Text("Choose method:"),
+                sg.Listbox(
+                    ["bruteforce", "simplex"],
+                    default_values="bruteforce",
+                    select_mode=sg.LISTBOX_SELECT_MODE_SINGLE,
+                    no_scrollbar=True,
+                    size=(30, 0),
+                    enable_events=True,
+                    key="-MODE-",
+                ),
+            ],
             [sg.Text("Objective function:")],
             [self.create_function_row()],
             [sg.Text("Restrictions:")],
@@ -129,25 +131,28 @@ class Interface:
         return sg.Window("Lab1", layout, resizable=True, font=30)
 
     def read_input(self, values):
-        A = [[0.0] * (self.restrictions_num) for _ in range(self.dim)]
+        self.method = (
+            Problem.Method.BRUTEFORCE
+            if values["-MODE-"] == "bruteforce"
+            else Problem.Method.SIMPLEX
+        )
+        A = [[0.0] * (self.dim) for _ in range(self.restrictions_num)]
         b = [0.0] * self.restrictions_num
         c = [0.0] * self.dim
-        x_restrictions = [problem.Problem.RestrictionType.NONE] * self.dim
-        restrictions_types = [
-            problem.Problem.RestrictionType.EQ
-        ] * self.restrictions_num
-        opt_direction = problem.Problem.ObjectiveDirection.MAX
+        x_restrictions = [Problem.RestrictionType.NONE] * self.dim
+        restrictions_types = [Problem.RestrictionType.EQ] * self.restrictions_num
+        opt_direction = Problem.ObjectiveDirection.MAX
         if values["opt_direction"] == "MIN":
-            opt_direction = problem.Problem.ObjectiveDirection.MIN
+            opt_direction = Problem.ObjectiveDirection.MIN
 
-        for row in range(self.dim):
-            if values["c", row] == "":
+        for col in range(self.dim):
+            if values["c", col] == "":
                 return None
-            c[row] = float(values["c", row])
-            if values["x_restrictions", row]:
-                x_restrictions[row] = problem.Problem.RestrictionType.GEQ
+            c[col] = float(values["c", col])
+            if values["x_restrictions", col]:
+                x_restrictions[col] = Problem.RestrictionType.GEQ
 
-            for col in range(self.restrictions_num):
+            for row in range(self.restrictions_num):
                 if (values["A", row, col]) == "":
                     return None
                 else:
@@ -159,13 +164,13 @@ class Interface:
             b[i] = float(values["b", i])
 
             if values["restrictions", i] == "<=":
-                restrictions_types[i] = problem.Problem.RestrictionType.LEQ
+                restrictions_types[i] = Problem.RestrictionType.LEQ
             elif values["restrictions", i] == ">=":
-                restrictions_types[i] = problem.Problem.RestrictionType.GEQ
+                restrictions_types[i] = Problem.RestrictionType.GEQ
             else:
-                restrictions_types[i] = problem.Problem.RestrictionType.EQ
+                restrictions_types[i] = Problem.RestrictionType.EQ
 
-        return problem.Problem(
+        return Problem(
             dim=self.dim,
             A=A,
             b=b,
@@ -201,8 +206,14 @@ class Interface:
                     break
                 if event == "Solve":
                     problem = self.read_input(values)
-                    print(problem)
                     if problem == None:
                         self.display_error()
                     else:
                         problem.print()
+                        try:
+                            x = problem.solve(self.method)
+                            print("====")
+                            print(f"our's x = {x}")
+                            print(f"scipy x = {problem.solve(Problem.Method.SCIPY)}")
+                        except Exception as e:
+                            self.display_error()

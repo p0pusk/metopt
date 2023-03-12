@@ -23,6 +23,11 @@ class Problem:
         STANDART = 1
         CANON = 2
 
+    class Method(Enum):
+        SIMPLEX = 0
+        BRUTEFORCE = 1
+        SCIPY = 2
+
     def __init__(
         self,
         dim: int,
@@ -46,7 +51,27 @@ class Problem:
         assert len(self.b) == len(self.A)
         assert len(self.restrictions_types) == len(self.b)
 
-    def solve(self):
+    def solve(self, mode: Method):
+        if mode == Problem.Method.SIMPLEX:
+            standart = self.get_standart()
+            try:
+                spx = simplex.Simplex(standart.A, standart.b, standart.c)
+            except Exception as e:
+                raise e
+            return spx.simplex()
+        elif mode == Problem.Method.BRUTEFORCE:
+            canon = self.get_canon()
+            return bruteforce.brute_force(canon.A, canon.b, canon.c)
+        elif mode == Problem.Method.SCIPY:
+            standart = self.get_standart()
+            x = linprog(
+                A_ub=standart.A,
+                b_ub=standart.b,
+                c=[-standart.obj_direction.value * n for n in standart.c],
+            ).x
+            return x[: self.dim]
+
+    def solve_term(self):
         print("=======================================================================")
         print("GENERAL:")
         self.print()
@@ -76,7 +101,6 @@ class Problem:
         dual_standart = dual.get_standart()
         dual_standart.print()
 
-
         print("=======================================================================")
 
         print("RESULTS:")
@@ -101,7 +125,7 @@ class Problem:
 
         print()
         print("bruteforce answer for canon:")
-        print(bruteforce.brute_force(canon.A, canon.b, canon.c)[:self.dim])
+        print(bruteforce.brute_force(canon.A, canon.b, canon.c)[: self.dim])
 
         print("=======================================================================")
         print("RESULTS FOR DUAL:")
@@ -127,7 +151,9 @@ class Problem:
 
         print()
         print("bruteforce answer for dual canon:")
-        print(bruteforce.brute_force(dual_canon.A, dual_canon.b, dual_canon.c)[:self.dim])
+        print(
+            bruteforce.brute_force(dual_canon.A, dual_canon.b, dual_canon.c)[: self.dim]
+        )
 
     def get_standart(self):
         standart = Problem(
@@ -175,7 +201,9 @@ class Problem:
         x_restrictions_copy = self.x_restrictions.copy()
         c_copy = self.c.copy()
 
-        N, B, A, b, c, v = bruteforce.to_canon(A_copy, restrictions_types_copy, b_copy, x_restrictions_copy, c_copy)
+        N, B, A, b, c, v = bruteforce.to_canon(
+            A_copy, restrictions_types_copy, b_copy, x_restrictions_copy, c_copy
+        )
         canon = Problem(
             dim=len(b_copy),
             A=A,
@@ -252,7 +280,11 @@ class Problem:
             print(self.b[i])
 
         for idx, r in enumerate(self.x_restrictions):
-            if idx > 0 and idx != len(self.x_restrictions):
+            if (
+                idx > 0
+                and idx != len(self.x_restrictions)
+                and r != Problem.RestrictionType.NONE
+            ):
                 print(",", end=" ")
             if r == Problem.RestrictionType.GEQ:
                 print(f"x_{idx + 1} >= 0", end="")

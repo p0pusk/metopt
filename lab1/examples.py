@@ -86,3 +86,13 @@ prb5 = Problem(
     c=[2, -1],
     obj_direction=Problem.ObjectiveDirection.MAX,
 )
+
+prb6 = Problem(
+    dim=2,
+    c=[1, 1],
+    A=[[1, 1], [1, 1]],
+    b=[2, 3],
+    x_restrictions=[Problem.RestrictionType.GEQ, Problem.RestrictionType.GEQ],
+    restrictions_types=[Problem.RestrictionType.LEQ, Problem.RestrictionType.LEQ],
+    obj_direction=Problem.ObjectiveDirection.MAX,
+)
