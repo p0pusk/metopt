@@ -39,7 +39,7 @@ class Interface:
             [
                 sg.Text("Number of restrictions:", expand_x=True, expand_y=True),
                 sg.Combo(
-                    values=[*range(1, self.max_dim)],
+                    values=[*range(1, self.max_dim + 1)],
                     default_value=self.restrictions_num,
                     readonly=True,
                     enable_events=True,
@@ -66,7 +66,7 @@ class Interface:
             else:
                 row.append(sg.Text("f(x) = ", expand_x=True, expand_y=True))
             row.append(sg.Input(size=(2, 0), key=("c", i), expand_x=True))
-            row.append(sg.Text(f"x_{i} ", expand_x=True))
+            row.append(sg.Text(f"x_{i+1} ", expand_x=True))
 
         row.append(sg.Text("-->", expand_x=True))
         row.append(
@@ -86,7 +86,7 @@ class Interface:
             if i != 0:
                 row.append(sg.Text("+", expand_x=True, expand_y=True))
             row.append(sg.Input(size=(2, 0), key=("A", row_number, i), expand_x=True))
-            row.append(sg.Text(f"x_{i} ", expand_x=True, expand_y=True))
+            row.append(sg.Text(f"x_{i+1} ", expand_x=True, expand_y=True))
 
         row.append(
             sg.Combo(
@@ -111,7 +111,7 @@ class Interface:
         for i in range(self.dim):
             x_restr.append(
                 sg.Checkbox(
-                    f"x_{i} ≥ 0",
+                    f"x_{i+1} ≥ 0",
                     default=True,
                     key=("x_restrictions", i),
                     expand_x=True,
