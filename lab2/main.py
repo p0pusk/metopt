@@ -10,3 +10,5 @@ if __name__ == "__main__":
 
     problem = PotentialMethod(demand, supply, costs)
     problem.print()
+    problem.north_west_corner()
+    problem.print()

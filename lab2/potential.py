@@ -19,12 +19,12 @@ class PotentialMethod:
         self.demand = copy.deepcopy(demand)
         self.supply = copy.deepcopy(supply)
 
-        self.cells = [[PotentialMethod.Cell()] * n for _ in range(m)]
-        print(self.cells)
+        self.cells = []
 
         for i in range(m):
+            self.cells.append([])
             for j in range(n):
-                self.cells[i][j].cost = costs[i][j]
+                self.cells[i].append(PotentialMethod.Cell(cost=costs[i][j]))
 
     def north_west_corner(self):
         n = len(self.demand)
@@ -56,5 +56,5 @@ class PotentialMethod:
                     f" {self.cells[row][col].val}"
                 )
             rows.append(cur_row)
-        # tablefmt="latex"
-        print(tabulate.tabulate(rows, headers))
+        tablefmt = "fancy_grid"
+        print(tabulate.tabulate(rows, headers, tablefmt=tablefmt))
