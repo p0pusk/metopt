@@ -83,14 +83,14 @@ class Problem:
         self.print()
 
         print("=======================================================================")
-        print("CANON:")
-        canon = self.get_canon()
-        canon.print()
-
-        print("=======================================================================")
         print("STANDART:")
         standart = self.get_standart()
         standart.print()
+
+        print("=======================================================================")
+        print("CANON:")
+        canon = self.get_canon()
+        canon.print()
 
         print("=======================================================================")
         print("DUAL:")
@@ -120,25 +120,27 @@ class Problem:
         print(f"v = {sum(standart.c[i] * x[i] for i in range(len(x)))}")
 
         print()
-        print("simplex ans:")
+        print("simplex ans for standart:")
         try:
             spx = simplex.Simplex(standart.A, standart.b, standart.c)
         except Exception as e:
             print(e)
             return
 
-        print(spx.simplex()[: self.dim])
+        x = spx.simplex()[: standart.dim]
+        print(f"x = {x}")
+        print(f"v = {sum(standart.c[i] * x[i] for i in range(len(x)))}")
 
         print()
         print("bruteforce answer for canon:")
-        print(
-            bruteforce.brute_force(
-                A=canon.A,
-                b=canon.b,
-                c=canon.c,
-                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1,
-            )[: self.dim]
+        x = bruteforce.brute_force(
+            A=canon.A,
+            b=canon.b,
+            c=canon.c,
+            sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1,
         )
+        print(f"x = {x[:self.dim]}")
+        print(f"v = {sum(canon.c[i] * x[i] for i in range(len(x)))}")
 
         print("=======================================================================")
         print("RESULTS FOR DUAL:")
@@ -188,30 +190,31 @@ class Problem:
             x_restrictions=self.x_restrictions,
         )
 
-        if standart.form == Problem.Form.STANDART:
+        if self.form == Problem.Form.STANDART:
             return standart
-        if standart.obj_direction == Problem.ObjectiveDirection.MIN:
-            standart.c = [-v for v in standart.c]
+        if self.obj_direction == Problem.ObjectiveDirection.MIN:
+            standart.c = [-v for v in self.c]
             standart.obj_direction = Problem.ObjectiveDirection.MAX
-        for i in range(len(standart.x_restrictions)):
-            if standart.x_restrictions[i] == Problem.RestrictionType.NONE:
-                standart.c.insert(i + 1, -standart.c[i])
+        for i in range(len(self.x_restrictions)):
+            if self.x_restrictions[i] == Problem.RestrictionType.NONE:
+                standart.c.append(-standart.c[i])
                 for j in range(len(standart.A)):
-                    standart.A[j].insert(i + 1, -standart.A[j][i])
+                    standart.A[j].append(-self.A[j][i])
                 standart.x_restrictions[i] = Problem.RestrictionType.GEQ
-                standart.x_restrictions.insert(i + 1, Problem.RestrictionType.GEQ)
+                standart.x_restrictions.append(Problem.RestrictionType.GEQ)
                 standart.dim += 1
-        for idx, r in enumerate(standart.restrictions_types):
+        for idx, r in enumerate(self.restrictions_types):
             if r == Problem.RestrictionType.EQ:
-                standart.restrictions_types[idx] = Problem.RestrictionType.GEQ
-                standart.A.insert(idx + 1, standart.A[idx])
-                standart.b.insert(idx + 1, standart.b[idx])
-                standart.restrictions_types.insert(idx + 1, Problem.RestrictionType.LEQ)
+                standart.A.append(standart.A[idx])
+                standart.b.append(standart.b[idx])
+                standart.restrictions_types[idx] = Problem.RestrictionType.LEQ
+                standart.restrictions_types.append(Problem.RestrictionType.GEQ)
         for idx, r in enumerate(standart.restrictions_types):
             if r == Problem.RestrictionType.GEQ:
                 standart.A[idx] = [-v for v in standart.A[idx]]
                 standart.b[idx] = -standart.b[idx]
                 standart.restrictions_types[idx] = Problem.RestrictionType.LEQ
+
         standart.form = Problem.Form.STANDART
 
         return standart
@@ -241,23 +244,19 @@ class Problem:
     def get_dual(self):
         # x_r = [None if r_t == Problem.RestrictionType.EQ else r_t for r_t in copy(self.restrictions_types)]
         standart = self.get_standart()
-        x_r_types = []
-        for i in range(len(standart.A[0])):
-            if standart.restrictions_types[i] == Problem.RestrictionType.LEQ:
-                x_r_types.append(Problem.RestrictionType.GEQ)
-            else:
-                x_r_types.append(Problem.RestrictionType.LEQ)
 
         return Problem(
             dim=len(standart.b),
             A=[list(i) for i in zip(*standart.A)],
             b=deepcopy(standart.c),
             c=deepcopy(standart.b),
-            restrictions_types=x_r_types,
+            restrictions_types=[
+                Problem.RestrictionType.GEQ for _ in range(len(standart.c))
+            ],
             x_restrictions=[
                 Problem.RestrictionType.GEQ for _ in range(len(standart.A))
             ],
-            obj_direction=Problem.ObjectiveDirection(-standart.obj_direction.value),
+            obj_direction=Problem.ObjectiveDirection.MIN,
         )
 
         # return Problem(

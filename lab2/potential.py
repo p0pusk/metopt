@@ -1,17 +1,27 @@
+from dataclasses import dataclass
 import copy
 import tabulate
 from enum import Enum
 
 
 class PotentialMethod:
+    @dataclass
     class Cell:
-        def __init__(
-            self, cost: float = float("NaN"), value: float = float("NaN")
-        ) -> None:
-            self.val = value
-            self.cost = cost
-            self.delta = float("NaN")
-            self.mark = None
+        value: float = float("NaN")
+        cost: float = float("NaN")
+        delta: float = float("NaN")
+
+    @dataclass
+    class CycleElement:
+        row: int
+        col: int
+        mark: str
+
+    class Direction(Enum):
+        TOP = 0
+        BOT = 1
+        LEFT = 2
+        RIGHT = 3
 
     def __init__(self, demand: list, supply: list, costs: list[list]) -> None:
         n = len(demand)
@@ -20,8 +30,9 @@ class PotentialMethod:
 
         self.demand = copy.deepcopy(demand)
         self.supply = copy.deepcopy(supply)
-
         self.cells = []
+        self.u = [] * m
+        self.v = [] * n
 
         for i in range(m):
             self.cells.append([])
@@ -40,11 +51,16 @@ class PotentialMethod:
                 elif self.demand[j] == 0:
                     continue
 
-                self.cells[i][j].val = min(self.supply[i], self.demand[j])
-                self.supply[i] -= self.cells[i][j].val
-                self.demand[j] -= self.cells[i][j].val
+                self.cells[i][j].value = min(self.supply[i], self.demand[j])
+                self.supply[i] -= self.cells[i][j].value
+                self.demand[j] -= self.cells[i][j].value
 
-    def print(self):
+    def potential(self):
+        self.north_west_corner()
+        self.
+        pass
+
+    def print(self, cycle: list = []):
         rows = list()
         headers = [""]
         for col, item in enumerate(self.demand):
@@ -53,33 +69,32 @@ class PotentialMethod:
             cur_row = list()
             cur_row.append(f"supplier {row + 1} supplies {item}")
             for col in range(len(self.demand)):
+                match = [x.mark for x in cycle if x.col == col and x.row == row]
                 cur_row.append(
-                    f"cost: {self.cells[row][col].cost}\nvalue:"
-                    f" {self.cells[row][col].val}"
+                    f"{f'[{match[0]}]' if len(match) > 0 else ''}\ncost:"
+                    f" {self.cells[row][col].cost}\nvalue: {self.cells[row][col].value}"
                 )
             rows.append(cur_row)
         tablefmt = "fancy_grid"
         print(tabulate.tabulate(rows, headers, tablefmt=tablefmt))
 
-    class Direction(Enum):
-        TOP = 0
-        BOT = 1
-        LEFT = 2
-        RIGHT = 3
-
-    def find_cycle(self, row: int, col: int, cycle: list, direction):
+    def find_cycle(self, row: int, col: int, cycle: list[CycleElement], direction):
         cycle = copy.deepcopy(cycle)
-        if row >= len(self.demand) or col >= len(self.supply) or row < 0 or col < 0:
-            return False, cycle
-        cell = self.cells[row][col]
 
-        if cell.val != float("NaN"):
+        if row >= len(self.supply) or col >= len(self.demand) or row < 0 or col < 0:
+            return False, cycle
+
+        if self.cells[row][col].value != float("NaN"):
             if len(cycle) == 0:
-                cycle.append((cell, "+"))
-            elif cycle[-1][0] == cell:
+                cycle.append(PotentialMethod.CycleElement(row, col, "+"))
+            elif cycle[-1].row == row and cycle[-1].col == col:
                 return True, cycle
             else:
-                cycle.append((cell, "+" if cycle[-1][1] == "-" else "-"))
+                cycle.append(
+                    PotentialMethod.CycleElement(
+                        row, col, "+" if cycle[-1].mark == "-" else "-"
+                    )
+                )
 
             if direction == PotentialMethod.Direction.TOP:
                 return self.find_cycle(row - 1, col, cycle, direction)
@@ -108,21 +123,3 @@ class PotentialMethod:
                 return top
             else:
                 return False, cycle
-
-    def print_cycle(self, cycle: list):
-        rows = list()
-        headers = [""]
-        for col, item in enumerate(self.demand):
-            headers.append(f"consumer {col + 1} needs {item}")
-        for row, item in enumerate(self.supply):
-            cur_row = list()
-            match = [x for ]
-            cur_row.append(f"supplier {row + 1} supplies {item}")
-            for col in range(len(self.demand)):
-                cur_row.append(
-                    f"cost: {self.cells[row][col].cost}\nvalue:"
-                    f" {self.cells[row][col].val}"
-                )
-            rows.append(cur_row)
-        tablefmt = "fancy_grid"
-        print(tabulate.tabulate(rows, headers, tablefmt=tablefmt))

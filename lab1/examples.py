@@ -10,7 +10,7 @@ prb0 = Problem(
         Problem.RestrictionType.GEQ,
     ],  # m
     x_restrictions=[Problem.RestrictionType.GEQ],  # n
-    obj_direction=Problem.ObjectiveDirection.MAX
+    obj_direction=Problem.ObjectiveDirection.MAX,
 )
 
 prb1 = Problem(
@@ -101,11 +101,19 @@ prb5 = Problem(
 )
 
 prb6 = Problem(
-    dim=2,
-    c=[1, 1],
-    A=[[1, 1], [1, 1]],
-    b=[2, 3],
-    x_restrictions=[Problem.RestrictionType.GEQ, Problem.RestrictionType.GEQ],
-    restrictions_types=[Problem.RestrictionType.LEQ, Problem.RestrictionType.LEQ],
+    dim=3,
+    c=[1, 1, 1],
+    A=[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    b=[2, 3, 4],
+    x_restrictions=[
+        Problem.RestrictionType.GEQ,
+        Problem.RestrictionType.NONE,
+        Problem.RestrictionType.GEQ,
+    ],
+    restrictions_types=[
+        Problem.RestrictionType.LEQ,
+        Problem.RestrictionType.EQ,
+        Problem.RestrictionType.GEQ,
+    ],
     obj_direction=Problem.ObjectiveDirection.MAX,
 )

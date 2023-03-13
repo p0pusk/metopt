@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from tproblem import *
 from potential import *
 
 if __name__ == "__main__":
