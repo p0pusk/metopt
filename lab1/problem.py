@@ -61,7 +61,12 @@ class Problem:
             return spx.simplex()[: self.dim]
         elif mode == Problem.Method.BRUTEFORCE:
             canon = self.get_canon()
-            return bruteforce.brute_force(canon.A, canon.b, canon.c)[: self.dim]
+            return bruteforce.brute_force(
+                A=canon.A,
+                b=canon.b,
+                c=canon.c,
+                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+            )[: self.dim]
         elif mode == Problem.Method.SCIPY:
             standart = self.get_standart()
             x = linprog(
@@ -125,7 +130,14 @@ class Problem:
 
         print()
         print("bruteforce answer for canon:")
-        print(bruteforce.brute_force(canon.A, canon.b, canon.c)[: self.dim])
+        print(
+            bruteforce.brute_force(
+                A=canon.A,
+                b=canon.b,
+                c=canon.c,
+                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+            )[: self.dim]
+        )
 
         print("=======================================================================")
         print("RESULTS FOR DUAL:")
@@ -152,7 +164,12 @@ class Problem:
         print()
         print("bruteforce answer for dual canon:")
         print(
-            bruteforce.brute_force(dual_canon.A, dual_canon.b, dual_canon.c)[: self.dim]
+            bruteforce.brute_force(
+                A=dual_canon.A,
+                b=dual_canon.b,
+                c=dual_canon.c,
+                sign=1 if dual_canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+            )[: self.dim]
         )
 
     def get_standart(self):

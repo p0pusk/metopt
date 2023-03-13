@@ -1,5 +1,18 @@
 from problem import Problem
 
+prb0 = Problem(
+    dim=1,
+    A=[[1], [1]],  # m*n
+    b=[2, 1],  # m
+    c=[1],  # n
+    restrictions_types=[
+        Problem.RestrictionType.LEQ,
+        Problem.RestrictionType.GEQ,
+    ],  # m
+    x_restrictions=[Problem.RestrictionType.GEQ],  # n
+    obj_direction=Problem.ObjectiveDirection.MAX
+)
+
 prb1 = Problem(
     dim=2,
     A=[[1, 1], [1, -2]],  # m*n

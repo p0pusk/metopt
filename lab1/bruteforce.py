@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import itertools
 import problem
@@ -56,7 +58,12 @@ def to_canon(A: list, restrictions_types: list, b: list, x_restrictions: list, c
     return N, B, A, b, c, 0
 
 
-def brute_force(A: list, b: list, c: list):
+def brute_force(A: list, b: list, c: list, sign: int):
+    A = copy.deepcopy(A)
+    b = b.copy()
+    c = c.copy()
+    c = [sign * n for n in c]
+
     # Проверка размерности A и b
     if len(A) != len(b):
         raise ValueError("Размерность матрицы A и вектора b не совпадают")
