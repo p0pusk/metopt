@@ -124,7 +124,7 @@ class Interface:
             [
                 sg.Text("Choose method:"),
                 sg.Combo(
-                    ["bruteforce", "simplex"],
+                    ["bruteforce", "simplex", "terminal"],
                     default_value="bruteforce",
                     size=(30, 0),
                     readonly=True,
@@ -147,6 +147,8 @@ class Interface:
             self.method = Problem.Method.BRUTEFORCE
         elif values["-MODE-"] == "simplex":
             self.method = Problem.Method.SIMPLEX
+        elif values["-MODE-"] == "terminal":
+            self.method = Problem.Method.TERM
 
         A = [[0.0] * (self.dim) for _ in range(self.restrictions_num)]
         b = [0.0] * self.restrictions_num
@@ -223,6 +225,9 @@ class Interface:
                 problem = self.read_input(values)
                 if problem == None:
                     self.display_error("Not all values inserted")
+                elif self.method == Problem.Method.TERM:
+                    problem.solve_term()
+                    sg.popup_no_buttons("Problem output is in console")
                 else:
                     try:
                         x = problem.solve(self.method)

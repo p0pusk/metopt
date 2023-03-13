@@ -27,6 +27,7 @@ class Problem:
         SIMPLEX = 0
         BRUTEFORCE = 1
         SCIPY = 2
+        TERM = 3
 
     def __init__(
         self,
@@ -65,7 +66,7 @@ class Problem:
                 A=canon.A,
                 b=canon.b,
                 c=canon.c,
-                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1,
             )[: self.dim]
         elif mode == Problem.Method.SCIPY:
             standart = self.get_standart()
@@ -135,7 +136,7 @@ class Problem:
                 A=canon.A,
                 b=canon.b,
                 c=canon.c,
-                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+                sign=1 if canon.obj_direction == Problem.ObjectiveDirection.MIN else -1,
             )[: self.dim]
         )
 
@@ -168,7 +169,11 @@ class Problem:
                 A=dual_canon.A,
                 b=dual_canon.b,
                 c=dual_canon.c,
-                sign=1 if dual_canon.obj_direction == Problem.ObjectiveDirection.MIN else -1
+                sign=(
+                    1
+                    if dual_canon.obj_direction == Problem.ObjectiveDirection.MIN
+                    else -1
+                ),
             )[: self.dim]
         )
 
