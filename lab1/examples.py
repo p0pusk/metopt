@@ -45,7 +45,7 @@ prb3 = Problem(
         [3, 2, 1, 4, 1, 1],
     ],
     b=[1, 2, 3, 4, 5, 3],
-    c=[4, 3, 2, 0, 0, 0],
+    c=[4, 3, 2, 1, 1, 1],
     restrictions_types=[
         Problem.RestrictionType.GEQ,
         Problem.RestrictionType.EQ,
@@ -57,6 +57,7 @@ prb3 = Problem(
     x_restrictions=[
         Problem.RestrictionType.GEQ,
         Problem.RestrictionType.GEQ,
+        Problem.RestrictionType.NONE,
         Problem.RestrictionType.NONE,
         Problem.RestrictionType.NONE,
         Problem.RestrictionType.NONE,

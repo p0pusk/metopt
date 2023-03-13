@@ -2,6 +2,7 @@ from copy import copy, deepcopy
 from enum import Enum
 from numpy import obj2sctype
 from scipy.optimize import linprog
+import numpy as np
 
 import simplex
 import bruteforce
@@ -89,7 +90,7 @@ class Problem:
 
         print("=======================================================================")
         print("CANON:")
-        canon = self.get_canon()
+        canon = standart.get_canon()
         canon.print()
 
         print("=======================================================================")
@@ -182,12 +183,12 @@ class Problem:
     def get_standart(self):
         standart = Problem(
             dim=self.dim,
-            A=self.A,
-            b=self.b,
-            c=self.c,
+            A=deepcopy(self.A),
+            b=deepcopy(self.b),
+            c=deepcopy(self.c),
             obj_direction=self.obj_direction,
-            restrictions_types=self.restrictions_types,
-            x_restrictions=self.x_restrictions,
+            restrictions_types=deepcopy(self.restrictions_types),
+            x_restrictions=deepcopy(self.x_restrictions),
         )
 
         if self.form == Problem.Form.STANDART:
