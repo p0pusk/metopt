@@ -4,6 +4,32 @@
 import bruteforce
 import numpy as np
 
+# Функция, приводящая транспортную задачу к закрытому виду
+def to_close(costs, supply, demand):
+    # Копируем данные
+    costs = copy.deepcopy(costs)
+    supply = copy.deepcopy(supply)
+    demand = copy.deepcopy(demand)
+
+    # Вычисление общего предложения и спроса
+    total_supply = sum(supply)
+    total_demand = sum(demand)
+
+    if total_supply < total_demand:
+        # Добавляем новый элемент в список предложений
+        supply += [total_demand - total_supply]
+        # Добавляем новую строку в матрицу стоимостей со значениями 0
+        costs += [[0] * len(costs[0])]
+    elif total_supply > total_demand:
+        # Добавляем новый элемент в список спроса
+        demand += [total_supply - total_demand]
+        # Добавляем новый столбец в матрицу стоимостей со значениями 0
+        for row in costs:
+            row += [0]
+
+    # Возвращаем обновленную матрицу стоимостей и списки предложений и спроса
+    return costs, supply, demand
+
 def print_solution(costs, solution):
     total_cost = 0
 
@@ -34,7 +60,9 @@ if __name__ == "__main__":
         [3, 10, 21, 9, 2]
     ]
 
-    print("Решение методом перебора опорных точек")
+    print()
+    print("Метод перебора:")
+    print()
 
     A, b, c = bruteforce.to_canon(supply, demand, costs)
     A.pop()
@@ -42,6 +70,8 @@ if __name__ == "__main__":
     brute_solution = bruteforce.brute_force(A, b, c)
     brute_solution = np.reshape(brute_solution, (len(supply), len(demand)))
 
+    print(brute_solution)
+    print()
     print_solution(costs, brute_solution)
 
     # problem = PotentialMethod(demand, supply, costs)

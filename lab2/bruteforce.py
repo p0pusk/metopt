@@ -3,33 +3,6 @@ import itertools
 import numpy as np
 
 
-# Функция, приводящая транспортную задачу к закрытому виду
-def to_close(costs, supply, demand):
-    # Копируем данные
-    costs = copy.deepcopy(costs)
-    supply = copy.deepcopy(supply)
-    demand = copy.deepcopy(demand)
-
-    # Вычисление общего предложения и спроса
-    total_supply = sum(supply)
-    total_demand = sum(demand)
-
-    if total_supply < total_demand:
-        # Добавляем новый элемент в список предложений
-        supply += [total_demand - total_supply]
-        # Добавляем новую строку в матрицу стоимостей со значениями 0
-        costs += [[0] * len(costs[0])]
-    elif total_supply > total_demand:
-        # Добавляем новый элемент в список спроса
-        demand += [total_supply - total_demand]
-        # Добавляем новый столбец в матрицу стоимостей со значениями 0
-        for row in costs:
-            row += [0]
-
-    # Возвращаем обновленную матрицу стоимостей и списки предложений и спроса
-    return costs, supply, demand
-
-
 # Функция, преобразующая исходные данные транспортной задачи в канонический вид
 def to_canon(supply: list, demand: list, costs: list):
     # Получаем размеры
