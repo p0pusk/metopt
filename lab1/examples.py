@@ -93,11 +93,11 @@ prb4 = Problem(
 
 prb5 = Problem(
     dim=2,
+    c=[2, -1],
     A=[[2, -1], [1, -5]],
     b=[2, -4],
     x_restrictions=[Problem.RestrictionType.GEQ, Problem.RestrictionType.GEQ],
     restrictions_types=[Problem.RestrictionType.GEQ, Problem.RestrictionType.GEQ],
-    c=[2, -1],
     obj_direction=Problem.ObjectiveDirection.MAX,
 )
 

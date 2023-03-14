@@ -84,6 +84,7 @@ class Simplex:
                 self.c[j] = c[j]
             return
 
+        print("L_AUX")
         # L_aux
         self.c = [0.0] * (n + m + 1)
         self.c[0] = -1

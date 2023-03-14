@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-# from potential import *
+from tproblem import *
 import bruteforce
 import numpy as np
+
 
 # Функция, приводящая транспортную задачу к закрытому виду
 def to_close(costs, supply, demand):
@@ -30,6 +31,7 @@ def to_close(costs, supply, demand):
     # Возвращаем обновленную матрицу стоимостей и списки предложений и спроса
     return costs, supply, demand
 
+
 def print_solution(costs, solution):
     total_cost = 0
 
@@ -39,42 +41,46 @@ def print_solution(costs, solution):
             if solution[i][j] == 0:
                 continue
 
-            print(f"{i} \t\t->\t\t {j} \t\t\t {solution[i][j]} \t\t {cost * solution[i][j]}")
+            print(
+                f"{i} \t\t->\t\t {j} \t\t\t {solution[i][j]} \t\t"
+                f" {cost * solution[i][j]}"
+            )
             total_cost += cost * solution[i][j]
 
     print()
     print("Общая стоимость: " + str(total_cost))
     return total_cost
 
+
 if __name__ == "__main__":
     # supply = [16, 11, 22, 20]
     # demand = [25, 11, 17, 7, 9]
     # costs = [[9, 5, 7, 6, 12], [6, 2, 10, 2, 6], [4, 8, 5, 9, 8], [5, 4, 16, 11, 14]]
 
+    A = [
+        [0, 16, 3, 11, 12, 20],
+        [22, 7, 1, 4, 14, 10],
+        [17, 3, 7, 4, 9, 13],
+        [11, 1, 6, 7, 8, 8],
+        [12, 3, 2, 5, 6, 7],
+    ]
     supply = [4, 21, 13, 10]
     demand = [15, 2, 11, 8, 12]
-    costs = [
-        [5, 13, 17, 5, 3],
-        [2, 6, 9, 3, 11],
-        [7, 14, 16, 9, 6],
-        [3, 10, 21, 9, 2]
-    ]
+    costs = [[5, 13, 17, 5, 3], [2, 6, 9, 3, 11], [7, 14, 16, 9, 6], [3, 10, 21, 9, 2]]
+    #
+    # print()
+    # print("Метод перебора:")
+    # print()
+    #
+    # A, b, c = bruteforce.to_canon(supply, demand, costs)
+    # A.pop()
+    # b.pop()
+    # brute_solution = bruteforce.brute_force(A, b, c)
+    # brute_solution = np.reshape(brute_solution, (len(supply), len(demand)))
+    #
+    # print(brute_solution)
+    # print()
+    # print_solution(costs, brute_solution)
 
-    print()
-    print("Метод перебора:")
-    print()
-
-    A, b, c = bruteforce.to_canon(supply, demand, costs)
-    A.pop()
-    b.pop()
-    brute_solution = bruteforce.brute_force(A, b, c)
-    brute_solution = np.reshape(brute_solution, (len(supply), len(demand)))
-
-    print(brute_solution)
-    print()
-    print_solution(costs, brute_solution)
-
-    # problem = PotentialMethod(demand, supply, costs)
-    # problem.print()
-    # problem.north_west_corner()
-    # problem.print()
+    transport_problem = TransportProblem(demand, supply, costs)
+    transport_problem.potential_method()
