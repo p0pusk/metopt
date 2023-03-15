@@ -53,21 +53,10 @@ def print_solution(costs, solution):
 
 
 if __name__ == "__main__":
-    # supply = [16, 11, 22, 20]
-    # demand = [25, 11, 17, 7, 9]
-    # costs = [[9, 5, 7, 6, 12], [6, 2, 10, 2, 6], [4, 8, 5, 9, 8], [5, 4, 16, 11, 14]]
-
-    A = [
-        [0, 16, 3, 11, 12, 20],
-        [22, 7, 1, 4, 14, 10],
-        [17, 3, 7, 4, 9, 13],
-        [11, 1, 6, 7, 8, 8],
-        [12, 3, 2, 5, 6, 7],
-    ]
-    supply = [4, 21, 13, 10]
+    supply = [4, 22, 13, 10]
     demand = [15, 2, 11, 8, 12]
     costs = [[5, 13, 17, 5, 3], [2, 6, 9, 3, 11], [7, 14, 16, 9, 6], [3, 10, 21, 9, 2]]
-    #
+
     # print()
     # print("Метод перебора:")
     # print()
@@ -81,6 +70,12 @@ if __name__ == "__main__":
     # print(brute_solution)
     # print()
     # print_solution(costs, brute_solution)
+    #
+    # print("=========U-V-Method========")
+    # transport_problem = TransportProblem(demand, supply, costs)
+    # transport_problem.potential_method()
 
-    transport_problem = TransportProblem(demand, supply, costs)
-    transport_problem.potential_method()
+    cos, sup, dem = to_close(costs, supply, demand)
+    print(f"cos={cos}")
+    print(f"sup={sup}")
+    print(f"dem={dem}")

@@ -1,3 +1,4 @@
+import tabulate
 import numpy as np
 import copy
 from cycle import *
@@ -14,14 +15,14 @@ class TransportProblem:
         for i in range(len(supply)):
             A[i + 1].insert(0, supply[i])
 
-        print(A)
-
         self.rate_array = np.array(copy.deepcopy(A), dtype=int)
         self.s_b = np.sum(self.rate_array, axis=0)[0]
         self.s_a = np.sum(self.rate_array, axis=1)[0]
         self.n = len(A) - 1  # кол-во пунктов хранения
         self.m = len(A[0]) - 1  # кол-во пунктов назначения
         self.result_vec = []
+        self.v_potential = [None] * self.m
+        self.u_potential = [None] * self.n
 
         self.__create_supplies_array()
 
@@ -208,13 +209,16 @@ class TransportProblem:
 
         while True:
             print("step " + str(iteration_index))
-            print(self.supplies_array)
+            # print(self.supplies_array)
+            self.print()
             print("Objective function value: " + str(self.obj_function_value()))
 
             self.__compute_potentials()
             indexes = self.__check_optimal_solution()
 
             if indexes is None:
+                print("final:")
+                self.print()
                 break
 
             print("___________________")
@@ -229,6 +233,27 @@ class TransportProblem:
             iteration_index += 1
 
         print("Done!")
+
+    def print(self):
+        rows = list()
+        headers = []
+        for row, item in enumerate(self.supplies_array):
+            cur_row = list()
+            for col in range(len(self.supplies_array[0])):
+                cur_row.append(
+                    f"cost: {self.rate_array[row+1][col+1]}\nvalue:"
+                    f" {self.supplies_array[row][col]}"
+                )
+            cur_row.append(f"U[{row + 1}] = {self.u_potential[row]}")
+            rows.append(cur_row)
+
+        last_row = []
+        for col in range(len(self.supplies_array[0])):
+            last_row.append(f"V[{col + 1}] = {self.v_potential[col]}")
+        rows.append(last_row)
+
+        tablefmt = "fancy_grid"
+        print(tabulate.tabulate(rows, headers, tablefmt=tablefmt))
 
     def __brute_force_method(self):
         print("brute_force")
