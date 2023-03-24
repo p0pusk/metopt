@@ -22,10 +22,10 @@ class Function:
         plt.plot(x_list, y_list)
         plt.xlabel("x")
         plt.ylabel("f(x)")
-        plt.title("$x^6 + 3*x^2 + 6*x - 1$")
+        plt.title("$xlnx$")
         plt.plot(self.min_gs, self.f(self.min_gs), "ro", label="Golden Section min")
         plt.plot(self.min_bf, self.f(self.min_bf), "bo", label="Bruteforce min")
-        plt.plot(self.min_hy, self.f(self.min_hy), "mo", label="Dystomy min")
+        plt.plot(self.min_hy, self.f(self.min_hy), "mo", label="Dychotomy min")
         plt.legend()
         plt.show()
 

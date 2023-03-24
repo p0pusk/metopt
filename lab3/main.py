@@ -2,13 +2,13 @@ from function import *
 
 
 def f(x: float):
-    return pow(x, 6) + 3 * pow(x, 2) + 6 * x - 1
+    return x * math.log(x)
 
 
 if __name__ == "__main__":
     # "x^6 + 3*x^2 + 6*x - 1"
-    a = -1
-    b = 0
+    a = 0.1
+    b = 2.1
     eps_list = [0.1, 0.01, 0.001]
     function = Function(a, b, f)
 
