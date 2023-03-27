@@ -11,10 +11,10 @@ class Function:
         self.f = f
         self.min_gs = float("nan")
         self.min_bf = float("nan")
-        self.min_hy = float("nan")
+        self.min_tp = float("nan")
         self.iter_gs = 0
         self.iter_bf = 0
-        self.iter_hy = 0
+        self.iter_tp = 0
 
     def plot(self):
         x_list = np.linspace(self.a, self.b, 1000)
@@ -25,7 +25,7 @@ class Function:
         plt.title("$xlnx$")
         plt.plot(self.min_gs, self.f(self.min_gs), "ro", label="Golden Section min")
         plt.plot(self.min_bf, self.f(self.min_bf), "bo", label="Bruteforce min")
-        plt.plot(self.min_hy, self.f(self.min_hy), "mo", label="Dychotomy min")
+        plt.plot(self.min_tp, self.f(self.min_tp), "mo", label="Test-points min")
         plt.legend()
         plt.show()
 
@@ -74,18 +74,39 @@ class Function:
         self.iter_bf = iterations
         return x[min_idx], iterations
 
-    def dichotomy_method(self, eps: float):
-        a = self.a
+    def test_points(self, eps: float):
         b = self.b
-        alpha = (b - a) / 100
+        x = [0.0] * 3
+        vals = [0.0] * 3
+        for i in range(3):
+            x[i] = self.a + b / 4 * (i + 1)
+            vals[i] = self.f(x[i])
         iterations = 1
-        while abs(b - a) > eps:
-            tmp = (a + b) / 2
-            if self.f(tmp - alpha) < self.f(tmp + alpha):
-                b = tmp
-            else:
-                a = tmp
+        while abs(x[0] - x[2]) > eps:
             iterations += 1
-        self.min_hy = (a + b) / 2
-        self.iter_hy = iterations
-        return (a + b) / 2, iterations
+            if vals[0] < vals[1]:
+                b = b / 2
+                x[1] = x[0]
+                vals[1] = vals[0]
+                x[0] = x[1] - b / 4
+                x[2] = x[1] + b / 4
+                vals[0] = self.f(x[0])
+                vals[2] = self.f(x[2])
+            else:
+                if vals[1] < vals[2]:
+                    b = b / 2
+                    x[0] = x[1] - b / 4
+                    x[2] = x[1] + b / 4
+                    vals[0] = self.f(x[0])
+                    vals[2] = self.f(x[2])
+                else:
+                    b = b / 2
+                    x[1] = x[2]
+                    vals[1] = vals[2]
+                    x[0] = x[1] - b / 4
+                    x[2] = x[1] + b / 4
+                    vals[0] = self.f(x[0])
+                    vals[2] = self.f(x[2])
+        self.min_tp = x[1]
+        self.iter_tp = iterations
+        return x[1], iterations
