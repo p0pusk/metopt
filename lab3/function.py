@@ -25,7 +25,7 @@ class Function:
         plt.title("$xlnx$")
         plt.plot(self.min_gs, self.f(self.min_gs), "ro", label="Golden Section min")
         plt.plot(self.min_bf, self.f(self.min_bf), "bo", label="Bruteforce min")
-        plt.plot(self.min_tp, self.f(self.min_tp), "mo", label="Test-points min")
+        plt.plot(self.min_tp, self.f(self.min_tp), "mo", label="Dychotomy min")
         plt.legend()
         plt.show()
 
@@ -73,6 +73,22 @@ class Function:
         self.min_bf = x[min_idx]
         self.iter_bf = iterations
         return x[min_idx], iterations
+
+    def dichotomy_method(self, eps: float):
+        a = self.a
+        b = self.b
+        alpha = (b - a) / 100
+        iterations = 1
+        while abs(b - a) > eps:
+            tmp = (a + b) / 2
+            if self.f(tmp - alpha) < self.f(tmp + alpha):
+                b = tmp
+            else:
+                a = tmp
+            iterations += 1
+        self.min_tp = (a + b) / 2
+        self.iter_tp = iterations
+        return (a + b) / 2, iterations
 
     def test_points(self, eps: float):
         b = self.b
