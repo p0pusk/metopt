@@ -53,11 +53,13 @@ class Problem:
         assert len(self.b) == len(self.A)
         assert len(self.restrictions_types) == len(self.b)
 
-    def solve(self, mode: Method):
+    def solve(self, mode: Method, verbose=False):
         if mode == Problem.Method.SIMPLEX:
             standart = self.get_standart()
             try:
-                spx = simplex.Simplex(standart.A, standart.b, standart.c)
+                spx = simplex.Simplex(
+                    standart.A, standart.b, standart.c, verbose=verbose
+                )
             except Exception as e:
                 raise e
             return spx.simplex()[: self.dim]

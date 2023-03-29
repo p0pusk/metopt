@@ -1,5 +1,6 @@
 import copy
 import math
+from tabulate import tabulate
 
 
 class Simplex:
@@ -51,8 +52,11 @@ class Simplex:
         self.B = copy.deepcopy(B)
         self.B.pop(B.index(l))
         self.B.append(e)
+        # self.N.sort()
+        # self.B.sort()
 
-    def __init__(self, A: list[list], b: list, c: list):
+    def __init__(self, A: list[list], b: list, c: list, verbose=False):
+        self.verbose = verbose
         m = len(A)
         n = len(A[0])
         self.N = []
@@ -84,7 +88,6 @@ class Simplex:
                 self.c[j] = c[j]
             return
 
-        print("L_AUX")
         # L_aux
         self.c = [0.0] * (n + m + 1)
         self.c[0] = -1
@@ -156,27 +159,14 @@ class Simplex:
         else:
             raise Exception("Задача неразрешима")
 
-    def print(self):
-        print("=======================================================================")
-        print("N:")
-        print(self.N)
-        print("B:")
-        print(self.B)
-        print("A:")
-        print(self.A)
-        print("b:")
-        print(self.b)
-        print("c:")
-        print(self.c)
-        print("v:")
-        print(self.v)
-        print("=======================================================================")
-
     def simplex(self):
         n = len(self.c)
         m = len(self.b)
 
         delta = [0.0] * (n + m)
+        if self.verbose:
+            self.print_table()
+
         while any(self.c[j] > 0 for j in self.N):
             e = -1
             for i in self.N:
@@ -193,6 +183,10 @@ class Simplex:
                 raise Exception("Задача неограниченная")
             else:
                 self.pivot(self.N, self.B, self.A, self.b, self.c, self.v, l, e)
+
+            if self.verbose:
+                self.print_table()
+
         x = [0.0] * n
         for i in range(n):
             if i in self.B:
@@ -200,6 +194,28 @@ class Simplex:
             else:
                 x[i] = 0.0
         return x
+
+    def print_table(self):
+        headers = [""]
+        rows = []
+        for c in range(len(self.A[0])):
+            headers.append(f"x{c+1}")
+        headers.append("")
+        rows.append(headers)
+        for b in self.B:
+            row = [f"x{b+1}"]
+            for c in range(len(self.A[0])):
+                row.append(str(self.A[b][c]))
+            rows.append(row)
+            row.append(str(self.b[b]))
+
+        obj_row = ["obj"]
+        for c in range(len(self.A[0])):
+            obj_row.append(str(-self.c[c]))
+        obj_row.append(str(self.v))
+
+        rows.append(obj_row)
+        print(tabulate(rows, tablefmt="latex"))
 
 
 def minimizing_index(delta: list, B: list):

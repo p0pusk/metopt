@@ -118,3 +118,22 @@ prb6 = Problem(
     ],
     obj_direction=Problem.ObjectiveDirection.MAX,
 )
+
+inf_loop = Problem(
+    dim=4,
+    c=[10, -57, -9, -24],
+    A=[[1 / 2, -11 / 2, -5 / 2, 9], [1 / 2, -3 / 2, -1 / 2, 1], [1, 0, 0, 0]],
+    b=[0, 0, 1],
+    x_restrictions=[
+        Problem.RestrictionType.GEQ,
+        Problem.RestrictionType.GEQ,
+        Problem.RestrictionType.GEQ,
+        Problem.RestrictionType.GEQ,
+    ],
+    restrictions_types=[
+        Problem.RestrictionType.LEQ,
+        Problem.RestrictionType.LEQ,
+        Problem.RestrictionType.LEQ,
+    ],
+    obj_direction=Problem.ObjectiveDirection.MAX,
+)
