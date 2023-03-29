@@ -20,7 +20,7 @@ if __name__ == "__main__":
         print(f"f_min bruteforce = {function.f(min)}")
         print(f"iter bruteforce = {iter}")
         print(f"-----------------------------------------")
-        min, iter = function.goldenSectionSearch(eps=0.1)
+        min, iter = function.goldenSectionSearch(eps)
         print(f"min golden section = {min}")
         print(f"f_min golden section = {function.f(min)}")
         print(f"iter golden section = {iter}")

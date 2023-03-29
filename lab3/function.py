@@ -38,7 +38,7 @@ class Function:
         x2 = r - resphi * (r - l)
         f1 = self.f(x1)
         f2 = self.f(x2)
-        iterations = 1
+        iterations = 2
         while abs(r - l) > eps:
             iterations += 1
             if f1 < f2:
@@ -74,22 +74,6 @@ class Function:
         self.iter_bf = iterations
         return x[min_idx], iterations
 
-    def dichotomy_method(self, eps: float):
-        a = self.a
-        b = self.b
-        alpha = (b - a) / 100
-        iterations = 1
-        while abs(b - a) > eps:
-            tmp = (a + b) / 2
-            if self.f(tmp - alpha) < self.f(tmp + alpha):
-                b = tmp
-            else:
-                a = tmp
-            iterations += 1
-        self.min_tp = (a + b) / 2
-        self.iter_tp = iterations
-        return (a + b) / 2, iterations
-
     def test_points(self, eps: float):
         b = self.b
         x = [0.0] * 3
@@ -97,9 +81,9 @@ class Function:
         for i in range(3):
             x[i] = self.a + b / 4 * (i + 1)
             vals[i] = self.f(x[i])
-        iterations = 1
+        iterations = 3
         while abs(x[0] - x[2]) > eps:
-            iterations += 1
+            iterations += 2
             if vals[0] < vals[1]:
                 b = b / 2
                 x[1] = x[0]
