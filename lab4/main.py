@@ -1,12 +1,14 @@
-#!/usr/bin/env python
-
-from matplotlib import markers, pyplot as plt
+from matplotlib import pyplot as plt
 from function import *
 from gradient_descent import *
 
 
-def print_solution(xs: list, grads: list, alphas: list, i: int, name: str = 'Gradient descent'):
-    print(name + ':')
+def create_title(name: str = 'Gradient descent', eps: float = 0):
+    return name + f" for eps = {eps}" if eps != 0 else ""
+
+
+def print_solution(xs: list, grads: list, alphas: list, i: int, name: str = 'Gradient descent', eps: float = 0):
+    print(create_title(name, eps) + ':')
 
     print(f"xs: {xs}")
     print(f"grads: {grads}")
@@ -17,8 +19,9 @@ def print_solution(xs: list, grads: list, alphas: list, i: int, name: str = 'Gra
     print()
 
 
-def print_graph(xs: list, name: str = 'Gradient descent'):
-    plt.title(name)
+def print_graph(xs: list, name: str = 'Gradient descent', eps: float = 0):
+    plt.title(create_title(name, eps))
+
     x_range = np.arange(-0.15, 0, 0.0001)
     y_range = np.arange(-0.15, 0, 0.0001)
     x_grid, y_grid = np.meshgrid(x_range, y_range)
@@ -39,12 +42,12 @@ def main():
         print()
 
         xs, grads, alphas, i = gradient_descent(f, grad_f, eps=eps, search="backtracking_line")
-        print_solution(xs, grads, alphas, i, 'Gradient descent 1st order approximation')
-        print_graph(xs, "Gradient descent 1st order approximation")
+        print_solution(xs, grads, alphas, i, 'Gradient descent 1st order approximation', eps)
+        print_graph(xs, "Gradient descent 1st order approximation", eps)
 
         xs, grads, alphas, i = gradient_descent_dfp(f, grad_f, eps=eps, search="backtracking_line")
-        print_solution(xs, grads, alphas, i, 'Gradient descent 2nd order approximation (DFP)')
-        print_graph(xs, "Gradient descent 2nd order approximation (DFP)")
+        print_solution(xs, grads, alphas, i, 'Gradient descent 2nd order approximation (DFP)', eps)
+        print_graph(xs, "Gradient descent 2nd order approximation (DFP)", eps)
 
 
 if __name__ == "__main__":
