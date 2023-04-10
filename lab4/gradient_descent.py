@@ -37,8 +37,8 @@ def gradient_descent(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section
         grad = grad_f(x)
 
         # Проверка ортогональности звеньев градиентной ломаной
-        # if abs(grad @ grads[-1]) < eps:
-        #     break
+        if abs(grad @ grads[-1]) < eps:
+            break
 
         xs += [x]
         grads += [grad]
@@ -95,8 +95,8 @@ def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_sec
         H = H - np.outer(Hy, Hy) / (y @ Hy) + np.outer(s, s) / (s @ y)
 
         # Проверка ортогональности звеньев градиентной ломаной
-        # if abs(grad @ grads[-1]) < eps:
-        #     break
+        if abs(grad @ grads[-1]) < eps:
+            break
 
         xs += [x]
         grads += [grad]
