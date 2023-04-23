@@ -35,17 +35,17 @@ def print_graph(xs: list, name: str = 'Gradient descent', eps: float = 0):
 
 
 def main():
-    eps_list = [0.1, 0.01, 0.001]
+    eps_list = [0.1, 0.01, 0.001, 0.0001]
 
     for eps in eps_list:
         print(f"eps = {eps}:")
         print()
 
-        xs, grads, alphas, i = gradient_descent(f, grad_f, eps=eps, search="backtracking_line")
+        xs, grads, alphas, i = gradient_descent(f, grad_f, eps=eps, search="trial_point")
         print_solution(xs, grads, alphas, i, 'Gradient descent 1st order approximation', eps)
         print_graph(xs, "Gradient descent 1st order approximation", eps)
 
-        xs, grads, alphas, i = gradient_descent_dfp(f, grad_f, eps=eps, search="backtracking_line")
+        xs, grads, alphas, i = gradient_descent_dfp(f, grad_f, eps=eps, search="trial_point")
         print_solution(xs, grads, alphas, i, 'Gradient descent 2nd order approximation (DFP)', eps)
         print_graph(xs, "Gradient descent 2nd order approximation (DFP)", eps)
 

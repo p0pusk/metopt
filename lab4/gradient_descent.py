@@ -1,5 +1,5 @@
 import numpy as np
-from search import golden_section_search, backtracking_line_search
+from search import golden_section_search, trial_point_search
 
 
 def gradient_descent(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section'):
@@ -29,16 +29,12 @@ def gradient_descent(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section
     while not np.linalg.norm(grads[-1]) < eps:
         # выбор оптимального шага
         if search == 'golden_section':
-            alpha = golden_section_search(lambda a: f(xs[-1] - a * grads[-1]))
+            alpha = golden_section_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
         else:
-            alpha = backtracking_line_search(f, grad_f, xs[-1], -grads[-1])
+            alpha = trial_point_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
 
         x = xs[-1] - alpha * grads[-1]
         grad = grad_f(x)
-
-        # Проверка ортогональности звеньев градиентной ломаной
-        if abs(grad @ grads[-1]) < eps:
-            break
 
         xs += [x]
         grads += [grad]
@@ -80,9 +76,9 @@ def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_sec
 
         # выбор оптимального шага
         if search == 'golden_section':
-            alpha = golden_section_search(lambda a: f(xs[-1] - a * grads[-1]))
+            alpha = golden_section_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
         else:
-            alpha = backtracking_line_search(f, grad_f, xs[-1], d)
+            alpha = trial_point_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
 
         s = alpha * d  # шаг
 
@@ -93,10 +89,6 @@ def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_sec
         y = grad - grads[-1]  # разность градиентов
         Hy = H @ y
         H = H - np.outer(Hy, Hy) / (y @ Hy) + np.outer(s, s) / (s @ y)
-
-        # Проверка ортогональности звеньев градиентной ломаной
-        if abs(grad @ grads[-1]) < eps:
-            break
 
         xs += [x]
         grads += [grad]

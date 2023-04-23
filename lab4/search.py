@@ -14,42 +14,43 @@ def golden_section_search(f, a=0, b=1, eps=1e-2):
     """
 
     # Константа золотого сечения
-    phi = (1 + np.sqrt(5)) / 2
+    phi = (3 - np.sqrt(5)) / 2
 
-    # Границы в новом интервале
-    c = b - (b - a) / phi
-    d = a + (b - a) / phi
+    while abs(b - a) > eps:
+        c = a + phi * (b - a)
+        d = a + (1 - phi) * (b - a)
 
-    while abs(c - d) > eps:
         # Сужение интервала
-        if f(c) < f(d):
-            b = d
-        else:
+        if f(c) > f(d):
             a = c
-
-        # Новые точки c и d для следующей итерации
-        c = b - (b - a) / phi
-        d = a + (b - a) / phi
+        else:
+            b = d
 
     # Возвращаем среднее значение интервала как оптимальный шаг
     return (a + b) / 2
 
 
-def backtracking_line_search(f, grad_f, x, d, alpha=1, rho=0.5, c=0.1):
-    """Метод пробных точек для поиска оптимального шага
-
-    :param f: функция, для которой определяется оптимальный шаг
-    :param grad_f: градиент функции
-    :param x: текущая точка
-    :param d: направление поиска
-    :param alpha: начальное значение шага
-    :param rho: множитель для уменьшения шага
-    :param c: константа для условия Армихо
-
-    :return: оптимальный шаг alpha
+def trial_point_search(f, a=0, b=1, eps=1e-2):
     """
+    Метод пробных точек для поиска минимума функции f на отрезке [a, b] с точностью eps.
 
-    while f(x + alpha * d) > f(x) + c * alpha * np.dot(grad_f(x), d):
-        alpha *= rho
+    :param f: Функция, минимум которой ищется.
+    :param a: Левая граница отрезка поиска.
+    :param b: Правая граница отрезка поиска.
+    :param eps: Точность поиска.
 
-    return alpha
+    :return: Точка минимума функции f на отрезке [a, b].
+    """
+    while True:
+        net = [a + (b - a) / 4 * i for i in range(1, 4)]
+
+        if abs(b - a) < eps or f(net[0]) == f(net[1]):
+            return (a + b) / 2
+
+        if f(net[2]) < f(net[1]):
+            a = net[1]
+        elif f(net[0]) < f(net[1]):
+            b = net[1]
+        else:
+            a = net[0]
+            b = net[2]
