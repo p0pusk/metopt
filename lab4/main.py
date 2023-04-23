@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 from function import *
 from gradient_descent import *
+import numpy as np
 
 
 def create_title(name: str = 'Gradient descent', eps: float = 0):
@@ -41,13 +42,32 @@ def main():
         print(f"eps = {eps}:")
         print()
 
+        # search = trial_point / golden_search
+
         xs, grads, alphas, i = gradient_descent(f, grad_f, eps=eps, search="trial_point")
         print_solution(xs, grads, alphas, i, 'Gradient descent 1st order approximation', eps)
-        print_graph(xs, "Gradient descent 1st order approximation", eps)
+        # print_graph(xs, "Gradient descent 1st order approximation", eps)
 
         xs, grads, alphas, i = gradient_descent_dfp(f, grad_f, eps=eps, search="trial_point")
         print_solution(xs, grads, alphas, i, 'Gradient descent 2nd order approximation (DFP)', eps)
-        print_graph(xs, "Gradient descent 2nd order approximation (DFP)", eps)
+        # print_graph(xs, "Gradient descent 2nd order approximation (DFP)", eps)
+
+    eps = 0.01
+
+    xs, grads, alphas, i = gradient_descent(f, grad_f, eps=eps, search="trial_point")
+    print_graph(xs, "Gradient descent 1st order approximation", eps=eps)
+
+    m = 12
+    M = 20
+
+    print(f"||x_k - x_*||\t\t\t||grad(f_k)|| / m\t\t\t(1 + m / M) [f(x_k) - f(x_*)]")
+
+    for i in range(len(xs)):
+        one = np.linalg.norm(xs[i] - xs[-1])
+        two = np.linalg.norm(grads[i]) / m
+        three = (1 + m / M) * (f(xs[i]) - f(xs[-1]))
+        print(f"iter = {i + 1}:")
+        print(f"\t{one:.{5}f}\t\t\t\t{two:.{5}f}\t\t\t\t\t\t{three:.{5}f}")
 
 
 if __name__ == "__main__":
