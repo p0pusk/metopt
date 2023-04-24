@@ -1,5 +1,5 @@
 import numpy as np
-from search import golden_section_search, trial_point_search
+from search import golden_section_search, trial_point_search, fibonacci_search
 
 
 def gradient_descent(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section'):
@@ -44,7 +44,7 @@ def gradient_descent(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section
     return xs, grads, alphas, i
 
 
-def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_section'):
+def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2):
     """
     Реализация градиентного метода второго порядка ДФП.
 
@@ -75,10 +75,7 @@ def gradient_descent_dfp(f, grad_f, x0=None, dim=2, eps=1e-2, search='golden_sec
         d = - H @ grads[-1]  # направление поиска
 
         # выбор оптимального шага
-        if search == 'golden_section':
-            alpha = golden_section_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
-        else:
-            alpha = trial_point_search(lambda a: f(xs[-1] - a * grads[-1]), eps=eps)
+        alpha = fibonacci_search(lambda a: f(xs[-1] + a * d), eps=eps)
 
         s = alpha * d  # шаг
 

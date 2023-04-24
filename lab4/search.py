@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def golden_section_search(f, a=0, b=1, eps=1e-2):
+def golden_section_search(f, a=0, b=1, eps=1e-4):
     """
     Метод золотого сечения для нахождения оптимального шага.
 
@@ -30,7 +30,7 @@ def golden_section_search(f, a=0, b=1, eps=1e-2):
     return (a + b) / 2
 
 
-def trial_point_search(f, a=0, b=1, eps=1e-2):
+def trial_point_search(f, a=0, b=1, eps=1e-4):
     """
     Метод пробных точек для поиска минимума функции f на отрезке [a, b] с точностью eps.
 
@@ -54,3 +54,43 @@ def trial_point_search(f, a=0, b=1, eps=1e-2):
         else:
             a = net[0]
             b = net[2]
+
+
+def fibonacci_search(f, a=0, b=1, eps=1e-4):
+    """
+    Функция поиска оптимального шага методом Фибоначчи для метода ДФП (Девидона - Флетчера - Пауэлла).
+
+    :param f: Целевая функция
+    :param a: Начало отрезка поиска
+    :param b: Конец отрезка поиска
+    :param eps: Точность поиска
+    :return: Оптимальный шаг
+    """
+    n = 0
+    while (b - a) / eps >= fibonacci(n):
+        n += 1
+
+    for k in range(n - 1):
+        lk = a + (fibonacci(n - k - 2) / fibonacci(n - k)) * (b - a)
+        rk = a + (fibonacci(n - k - 1) / fibonacci(n - k)) * (b - a)
+        if f(lk) > f(rk):
+            a = lk
+        else:
+            b = rk
+
+    return (a + b) / 2
+
+
+def fibonacci(n):
+    """
+    Функция вычисления n-го числа Фибоначчи.
+
+    :param n: Порядковый номер числа Фибоначчи
+    :return: n-е число Фибоначчи
+    """
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+
+    return fibonacci(n - 1) + fibonacci(n - 2)
