@@ -8,8 +8,10 @@ if __name__ == '__main__':
 
     res = z.zoutendijk_method(x0, eta0)
 
-    print(f"Answer: {res}")
-    print(f"f(x) = {task.f(res)}")
+    # print()
+    # print(f"Answer: {res}")
+    # print()
+    # print(f"f(x) = {task.f(res)}")
 
     # task.rs += [
     #     lambda x: -3 * x[0] + 1 + 3 * x[1]

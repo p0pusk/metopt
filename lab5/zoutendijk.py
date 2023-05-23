@@ -16,13 +16,12 @@ def initial_approximation(x0=None, eps=1e-3):
     list: Updated approximation.
     """
     if x0 is None:
-        x0 = []
-        for _ in range(dim):
-            x0 += [1 + random.uniform(-0.1, 0.1)]
+        x0 = [1] * dim
 
     eta = max(r(x0) for r in rs)
     if eta < 0:
         return x0
+
 
     valid = False
     while not valid:
@@ -34,6 +33,7 @@ def initial_approximation(x0=None, eps=1e-3):
         while not valid:
             alpha /= 2
             if alpha < 2 ** -10:
+                alpha = 0.5
                 break
 
             x_next = x0 + alpha * s
@@ -125,8 +125,20 @@ def zoutendijk_method(x0, eta0, eps=1e-5):
     """
     x, delta = x0, -eta0
 
-    i = 0
-    for i in range(1000):
+    k = 0
+    print(f'k\tdelta\t\teta\t\t\tx_0\t\t\tx_1\t\tx_2\t\tf(x)')
+    # for k in range(50):
+
+    k = 0
+    while True:
+        digs = 5
+        k += 1
+        print(f"{int(k)}\t{delta:.{digs}f}\t{eta0:.{digs}f}\t{x[0]:.{digs}f}\t{x[1]:.{digs}f}\t{x[2]:.{digs}f}\t{f(x):.{digs}f}")
+        # print(f"eta: {eta0:.{digs}f}")
+        # print(f"x: {x[0]:.{digs}f} {x[1]:.{digs}f} {x[2]:.{digs}f}")
+        # print(f"f(x): {f(x):.{digs}f}")
+        # print(f'{int(k / 20)}\t{delta:.3}\t{eta0:.3}\t{x}\t{f(x):.3}')
+
         res = simplex(x, delta)
         *s, eta0 = res.x
 
@@ -138,6 +150,6 @@ def zoutendijk_method(x0, eta0, eps=1e-5):
         if delta < -max([r(x) for r in rs]) and abs(delta) < eps:
             break
 
-    print(f'Number of iterations: {i}')
+    print(f'Number of iterations: {k}')
 
     return x
