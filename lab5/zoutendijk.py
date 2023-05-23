@@ -5,7 +5,7 @@ from task import *
 from scipy.optimize import linprog
 
 
-def initial_approximation(x0=None, eps=1e-5):
+def initial_approximation(x0=None, eps=1e-3):
     """
     Calculate the initial approximation for the given x0.
 
@@ -18,7 +18,7 @@ def initial_approximation(x0=None, eps=1e-5):
     if x0 is None:
         x0 = []
         for _ in range(dim):
-            x0 += [1 + random.uniform(-0.1, +0.1)]
+            x0 += [1 + random.uniform(-0.1, 0.1)]
 
     eta = max(r(x0) for r in rs)
     if eta < 0:
@@ -33,7 +33,7 @@ def initial_approximation(x0=None, eps=1e-5):
 
         while not valid:
             alpha /= 2
-            if alpha < eps:
+            if alpha < 2 ** -10:
                 break
 
             x_next = x0 + alpha * s
@@ -125,7 +125,8 @@ def zoutendijk_method(x0, eta0, eps=1e-5):
     """
     x, delta = x0, -eta0
 
-    for _ in range(1000):
+    i = 0
+    for i in range(1000):
         res = simplex(x, delta)
         *s, eta0 = res.x
 
@@ -136,5 +137,7 @@ def zoutendijk_method(x0, eta0, eps=1e-5):
 
         if delta < -max([r(x) for r in rs]) and abs(delta) < eps:
             break
+
+    print(f'Number of iterations: {i}')
 
     return x
