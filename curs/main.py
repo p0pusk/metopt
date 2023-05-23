@@ -6,7 +6,7 @@ FPS = 100
 sc = pg.display.set_mode((1300, 700))
 clock = pg.time.Clock()
 
-plot = Plot(sc, 0.23389426, 0.46778852)
+plot = Plot(sc, 0.74388741, 0.3719437)
 
 while True:
     for i in pg.event.get():
