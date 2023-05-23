@@ -19,17 +19,12 @@ class Plot:
     river_len = 800
     state = State.FORWARD
 
-    def __init__(self, surface, w, r):
+    def __init__(self, surface, r, w):
         self.surface = surface
         self.r = r * self.scale
         self.w = w * self.scale
-        self.h = 2 * (math.sqrt(self.scale**2 - self.w**2)+self.r)
-        self.degree = 0
-
-        self.ul: tuple[float, float] = (self.init_x + self.h, self.init_y+ (self.scale-self.w))
-        self.ur: tuple[float, float] = (self.init_x + self.h, self.init_y +self.scale)
-        self.bl: tuple[float, float] = (self.init_x, self.init_y+(self.scale-self.w))
-        self.br: tuple[float, float] = (self.init_x, self.init_y + +self.scale)
+        self.h = 2 * math.sqrt(self.scale**2 + self.r**2 - self.w**2) + 0.1
+        self._reset_position()
 
     def update(self):
         if self.state == State.FORWARD:
@@ -89,11 +84,7 @@ class Plot:
 
         elif self.state == State.FINNISHING:
             if self.ur[1] >= self.river_len:
-                self.ul = (self.init_x + self.h, self.init_y)
-                self.ur = (self.init_x + self.h, self.init_y + self.w)
-                self.bl = (self.init_x, self.init_y)
-                self.br = (self.init_x, self.init_y + self.w)
-                self.degree = 0
+                self._reset_position()
                 self.state = State.FORWARD
                 return
             step = 1
@@ -175,3 +166,14 @@ class Plot:
         self.ur = (self.ur[0] + dx, self.ur[1] + dy)
         self.bl = (self.bl[0] + dx, self.bl[1] + dy)
         self.br = (self.br[0] + dx, self.br[1] + dy)
+
+    def _reset_position(self):
+        self.degree = 0
+
+        self.ul: tuple[float, float] = (
+            self.init_x + self.h,
+            self.init_y + self.scale - self.w,
+        )
+        self.ur: tuple[float, float] = (self.init_x + self.h, self.init_y + self.scale)
+        self.bl: tuple[float, float] = (self.init_x, self.init_y + self.scale - self.w)
+        self.br: tuple[float, float] = (self.init_x, self.init_y + self.scale)
